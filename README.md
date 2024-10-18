@@ -9,8 +9,9 @@ TODO
 TODO
 
 ## Environment setup
+Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way.
 
-TODO
+TO ADD
 
 ## Config file structure
 
@@ -19,6 +20,10 @@ TODO
 ## Proposed experiments
 
 ## Dataset for experiments
+
+We intend to use Da-TACOS dataset (https://github.com/MTG/da-tacos) because of its versatility, decent size and excellent metadata structure. It is organised into cliques that gather an original performance along with its covers, which fits perfectly into our needs.
+
+In future extensions, it is possible to utilize a dataset delivered by the Polish Society of Authors ZAiKS.
 
 ## Project schedule
 ### W1 (14-20.10.2024)
