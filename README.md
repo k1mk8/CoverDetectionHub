@@ -93,4 +93,4 @@ In future extensions, it is possible to utilize a dataset delivered by the Polis
 
 ### W14 (13-19.01.2025)
 
-Public project presentation
+:tada: Public project presentation :tada:
