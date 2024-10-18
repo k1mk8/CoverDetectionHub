@@ -21,18 +21,20 @@ The aim of the project is to prepare a framework for music cover detection. The 
 | Covers80 <br> [The covers80 cover song data set](http://labrosa.ee.columbia.edu/projects/coversongs/covers80/) |   <li>The dataset contains 80 songs, with 2 different performances of each song by different artists (160 tracks in total).  </li>   <br> <li>All audio files are encoded as 32 kbps MP3 (mono, 16 kHz sampling rate, bandwidth limited to 7 kHz). </li>  <br> Thoughts: We will not use the Covers80 dataset as primary dataset  because it is relatively small and is old (2007). Additionally, the audio files are of low quality (32 kbps, 16 kHz mono).The dataset was assembled somewhat randomly, and it may not provide the diversity or representativeness. However, it has become a CSI systems benchmark, that is why, if we have enough time, we will try to include it in out project. <br> Dataset appeared in a paper [THE 2007 LABROSA COVER SONG DETECTION SYSTEM](http://labrosa.ee.columbia.edu/~dpwe/pubs/EllisC07-covers.pdf).
 
 
-## Environment setup
-Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way.
+## Technology stack
+Main technologies in use:
+- Python: Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way. 
+- Gradio: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
+- Numpy: Library for maths operations.
+- PyTorch: Deep learning library.
 
-TO ADD
+Probably there will appear more libraries, strictly from MIR domain, which we will get to know during project development.
 
-## Config file structure
 
-TODO
-
-## Proposed experiments
-
-TODO
+## Planned functionality of the hub
+- Testing CSI methods on Da-TACOS dataset
+- Choosing between methods
+- Report on evaluation and calculated metrics
 
 ## Dataset for experiments
 
@@ -43,35 +45,51 @@ In future extensions, it is possible to utilize a dataset delivered by the Polis
 ## Project schedule
 ### W1 (14-20.10.2024)
 
-Gathering literature, preparing design proposal, tools selection, selection of dataset
+- [x] Gathering literature
+- [x] preparing design proposal
+- [x] tools selection
+- [x] selection of dataset
 
 ### W2 (21-27.10.2024)
 
-Preparing the environment, choice for the models, initial dataset preprocessing
+- [ ] Preparing the environment
+- [ ] choice for the models
+- [ ]  initial dataset preprocessing
 
 ### W3-W4 (28.10-10.11.2024)
 
-Implementation of the first functional prototype, including training at least one model and minimal GUI
+- [ ] Implementation of the first functional prototype
+- [ ] including training at least one model
+- [ ] minimal GUI
 
 ### W5-W6 (11-24.11.2024)
 
-First results evaluation, implementing improvements, training and adding subsequent models
+- [ ] First results evaluation
+- [ ] implementing improvements
+- [ ] training
+- [ ] adding subsequent models
 
 ### W7 (25.11-1.12.2024)
 
-Automated tests design, training of remaining models
+- [ ] Automated tests design
+- [ ] training of remaining models
 
 ### W8-W9 (02-15.12.2024)
 
-Evaluation of the results, improving GUI, re-training the models if necessary
+- [ ] Evaluation of the results
+- [ ] improving GUI
+- [ ] re-training the models if necessary
 
 ### W10-W12 (16.12.2024-05.01.2025)
 
-Working on the final presentation, tests, gathering final results, Xmas chill (optional)
+- [ ] Working on the final presentation
+- [ ] tests
+- [ ] gathering final results, Bożenarodzeniowy chill (optional)
 
 ### W13 (06-13.01.2025)
 
-Final results evaluation, preparation of the paper
+- [ ] Final results evaluation
+- [ ] preparation of the paper (?)
 
 ### W14 (13-19.01.2025)
 
