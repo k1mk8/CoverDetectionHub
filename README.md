@@ -23,10 +23,10 @@ The aim of the project is to prepare a framework for music cover detection. The 
 
 ## Technology stack
 Main technologies in use:
-- Python: Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way. 
-- Gradio: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
-- Numpy: Library for maths operations.
-- PyTorch: Deep learning library.
+- **Python**: Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way. 
+- **Gradio**: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
+- **Numpy**: Library for maths operations.
+- **PyTorch**: Deep learning library.
 
 Probably there will appear more libraries, strictly from MIR domain, which we will get to know during project development.
 
