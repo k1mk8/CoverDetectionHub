@@ -43,6 +43,9 @@ We intend to use Da-TACOS dataset (https://github.com/MTG/da-tacos) because of i
 
 In future extensions, it is possible to utilize a dataset delivered by the Polish Society of Authors ZAiKS.
 
+## Computing resources
+To train and run deep learning models, our project will need GPU devices. So far, we gathered two seperate units: RTX3090Ti and RTX2060.
+
 ## Project schedule
 ### W1 (14-20.10.2024)
 
