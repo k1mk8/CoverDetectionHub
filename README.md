@@ -29,6 +29,7 @@ Main technologies in use:
 - **Gradio**: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
 - **Numpy**: Library for maths operations.
 - **PyTorch**: Deep learning library.
+- **essentia**: A versatile tool for MIR operations
 - **venv** (or other tool): For making the project portable in an easy way
 
 Probably there will appear more libraries, strictly from MIR domain, which we will get to know during project development.
