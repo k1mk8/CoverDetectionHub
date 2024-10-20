@@ -28,6 +28,7 @@ Main technologies in use:
 - **Gradio**: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
 - **Numpy**: Library for maths operations.
 - **PyTorch**: Deep learning library.
+- **venv** (or other tool): For making the project portable in an easy way
 
 Probably there will appear more libraries, strictly from MIR domain, which we will get to know during project development.
 
@@ -41,7 +42,16 @@ Probably there will appear more libraries, strictly from MIR domain, which we wi
 
 We intend to use Da-TACOS dataset (https://github.com/MTG/da-tacos) because of its versatility, decent size and excellent metadata structure. It is organised into cliques that gather an original performance along with its covers, which fits perfectly into our needs.
 
-In future extensions, it is possible to utilize a dataset delivered by the Polish Society of Authors ZAiKS.
+In future extensions, utilising a dataset delivered by the Polish Society of Authors ZAiKS is possible.
+
+## Experiment scope
+
+In the initial phase of the project, it is intended to perform 1-1 comparisons for checking the similarity rate.
+
+For the evaluation of analysed methods, there are proposed 2 experiments:
+
+- synthetic generation of samples, where a defined percentage of an original piece is injected into a totally different sample (Batlle-Roca et al., https://arxiv.org/pdf/2407.14364)
+- direct comparison between two samples, where 2 full samples are processed. 
 
 ## Computing resources
 To train and run deep learning models, our project will need GPU devices. So far, we gathered two seperate units: RTX3090Ti and RTX2060.
