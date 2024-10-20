@@ -36,6 +36,8 @@ Probably there will appear more libraries, strictly from MIR domain, which we wi
 
 
 ## Planned functionality of the hub
+- Comparing two songs and returning the similarity score
+- User-friendly access via GUI
 - Testing CSI methods on Da-TACOS dataset
 - Choosing between methods
 - Report on evaluation and calculated metrics
