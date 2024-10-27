@@ -1,5 +1,7 @@
 # CoverDetectionHub
 
+Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
+
 ## Project description
 
 The aim of the project is to prepare a framework for music cover detection. The main assumption is to implement a "hub" that lets further researchers carry out various experiments in this field as well as compare different Music Information Retrieval (MIR) methods.
