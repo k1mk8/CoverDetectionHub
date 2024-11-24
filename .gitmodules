@@ -1,0 +1,3 @@
+[submodule "models/bytecover"]
+	path = models/bytecover
+	url = https://github.com/Orfium/bytecover.git
