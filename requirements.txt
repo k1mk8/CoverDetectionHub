@@ -1,0 +1,14 @@
+ffmpeg-python
+jsonlines
+nnaudio
+numpy
+optuna
+pandas
+protobuf
+pyyaml
+scikit-learn
+torch
+torchaudio
+torchvision
+tqdm
+wandb
