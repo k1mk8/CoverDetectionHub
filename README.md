@@ -4,7 +4,7 @@ Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
 
 ## Project description
 
-The aim of the project is to prepare a framework for music cover detection. The main assumption is to implement a "hub" that lets further researchers carry out various experiments in this field as well as compare different Music Information Retrieval (MIR) methods.
+The aim of the project is to prepare a framework for music cover detection. The main assumption is to implement a "hub" that lets researchers carry out various experiments in this field as well as compare different Music Information Retrieval (MIR) methods.
 
 ## Bibliography review
 
@@ -74,15 +74,15 @@ To train and run deep learning models, our project will need GPU devices. So far
 
 ### W2 (21-27.10.2024)
 
-- [ ] Preparing the environment
-- [ ] choice for the models
-- [ ]  initial dataset preprocessing
+- [x] Preparing the environment
+- [x] choice for the models
+- [x]  initial dataset preprocessing
 
 ### W3-W4 (28.10-10.11.2024)
 
-- [ ] Implementation of the first functional prototype
+- [x] Implementation of the first functional prototype
 - [ ] including training at least one model
-- [ ] minimal GUI
+- [x] minimal GUI
 
 ### W5-W6 (11-24.11.2024)
 
