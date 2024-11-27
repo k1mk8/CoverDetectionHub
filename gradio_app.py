@@ -21,6 +21,7 @@ def gradio_cover_interface(audio1, audio2, model_name):
         similarity = compute_similarity_coverhunter(audio1, audio2, coverhunter_model)
         threshold = 0.9
     else:
+        threshold = 0.9
         result, similarity = is_cover_song(audio1, audio2, model_name)
     
     # Determine cover or not based on similarity
@@ -43,7 +44,7 @@ app1 = gr.Interface(
     inputs=[
         gr.Audio(type="filepath", label="Query Song"),
         gr.Audio(type="filepath", label="Potential Cover Song"),
-        gr.Dropdown(choices=["MFCC", "Spectral Centroid", "ByteCover", "CoverHunter"], value="Model 1", label="Choose CSI Model")
+        gr.Dropdown(choices=["MFCC", "Spectral Centroid", "ByteCover", "CoverHunter"], value="MFCC", label="Choose CSI Model")
     ],
     outputs=[
         gr.Textbox(label="Result"),
@@ -69,4 +70,4 @@ app2 = gr.Interface(
 app = gr.TabbedInterface([app1, app2], ["Cover Song Identification", "Model Testing"])
 
 if __name__ == "__main__":
-    app.launch(share=True)
+    app.launch()
