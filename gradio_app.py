@@ -1,14 +1,31 @@
 import gradio as gr
-from models.models import load_bytecover_model
+from models.models import (
+    load_bytecover_model,
+    load_coverhunter_model,
+    compute_similarity_bytecover,
+    compute_similarity_coverhunter,
+)
 from models.utils import is_cover_song, test_model_on_dataset
 
 # Load ByteCover model
 bytecover_model = load_bytecover_model()
+coverhunter_model = load_coverhunter_model()
 
-# Gradio app setup for cover song identification
+
+# Gradio Interface for CoverHunter Integration
 def gradio_cover_interface(audio1, audio2, model_name):
-    result, score = is_cover_song(audio1, audio2, model_name, bytecover_model=bytecover_model)
-    return result, f"Similarity Score: {score}"
+    if model_name == "ByteCover":
+        similarity = compute_similarity_bytecover(audio1, audio2, bytecover_model)
+        threshold = 0.99
+    elif model_name == "CoverHunter":
+        similarity = compute_similarity_coverhunter(audio1, audio2, coverhunter_model)
+        threshold = 0.9
+    else:
+        result, similarity = is_cover_song(audio1, audio2, model_name)
+    
+    # Determine cover or not based on similarity
+    result = "Cover" if similarity >= threshold else "Not a Cover"
+    return result, f"Similarity Score: {similarity:}"
 
 # Gradio app setup for dataset testing
 def gradio_test_interface(model_name, dataset):
@@ -26,7 +43,7 @@ app1 = gr.Interface(
     inputs=[
         gr.Audio(type="filepath", label="Query Song"),
         gr.Audio(type="filepath", label="Potential Cover Song"),
-        gr.Dropdown(choices=["Model 1", "Model 2", "ByteCover"], value="Model 1", label="Choose CSI Model")
+        gr.Dropdown(choices=["MFCC", "Spectral Centroid", "ByteCover", "CoverHunter"], value="Model 1", label="Choose CSI Model")
     ],
     outputs=[
         gr.Textbox(label="Result"),
@@ -39,7 +56,7 @@ app1 = gr.Interface(
 app2 = gr.Interface(
     fn=gradio_test_interface,
     inputs=[
-        gr.Dropdown(choices=["Model 1", "Model 2", "ByteCover"], value="Model 1", label="Choose CSI Model"),
+        gr.Dropdown(choices=["Model 1", "Model 2", "ByteCover", "CoverHunter"], value="Model 1", label="Choose CSI Model"),
         gr.Dropdown(choices=["Dataset A", "Dataset B", "Dataset C"], value="Dataset A", label="Choose Dataset")
     ],
     outputs=[
@@ -52,4 +69,4 @@ app2 = gr.Interface(
 app = gr.TabbedInterface([app1, app2], ["Cover Song Identification", "Model Testing"])
 
 if __name__ == "__main__":
-    app.launch()
+    app.launch(share=True)

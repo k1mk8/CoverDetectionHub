@@ -30,8 +30,8 @@ def is_cover_song(audio1_path, audio2_path, model_name, bytecover_model=None):
 
     audio1 = load_audio(audio1_path)
     audio2 = load_audio(audio2_path)
-    features1 = extract_features_model_1(audio1) if model_name == "Model 1" else extract_features_model_2(audio1)
-    features2 = extract_features_model_1(audio2) if model_name == "Model 1" else extract_features_model_2(audio2)
+    features1 = extract_features_model_1(audio1) if model_name == "MFCC" else extract_features_model_2(audio1)
+    features2 = extract_features_model_1(audio2) if model_name == "MFCC" else extract_features_model_2(audio2)
     similarity_score = 1 - cosine(features1, features2)
     threshold = 0.99
     return ("Cover", similarity_score) if similarity_score >= threshold else ("Not a Cover", similarity_score)
