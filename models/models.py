@@ -175,4 +175,7 @@ def compute_similarity_coverhunter(audio1_path, audio2_path, model):
     # Compute cosine similarity
     similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
     return similarity.item()
-    
+
+# Configuration
+REMOVE_CONFIG_PATH = "models/re-move/data/baseline_defaults.json"
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
