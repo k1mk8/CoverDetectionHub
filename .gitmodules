@@ -1,0 +1,9 @@
+[submodule "models/bytecover"]
+	path = models/bytecover
+	url = https://github.com/Orfium/bytecover.git
+[submodule "models/CoverHunter"]
+	path = models/CoverHunter
+	url = https://github.com/Liu-Feng-deeplearning/CoverHunter.git
+[submodule "models/re-move"]
+	path = models/re-move
+	url = https://github.com/furkanyesiler/re-move.git

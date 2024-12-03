@@ -1,0 +1,16 @@
+ffmpeg-python
+jsonlines
+nnaudio
+numpy
+optuna
+pandas
+protobuf
+pyyaml
+scikit-learn
+torch
+torchaudio
+torchvision
+tqdm
+wandb
+typeguard==2.13.3
+gradio
