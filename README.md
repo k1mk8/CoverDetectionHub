@@ -81,15 +81,16 @@ To train and run deep learning models, our project will need GPU devices. So far
 ### W3-W4 (28.10-10.11.2024)
 
 - [x] Implementation of the first functional prototype
-- [ ] including training at least one model
+- [x] including training at least one model
 - [x] minimal GUI
 
 ### W5-W6 (11-24.11.2024)
 
 - [ ] First results evaluation
-- [ ] implementing improvements
-- [ ] training
+- [x] implementing improvements
+- [x] training
 - [ ] adding subsequent models
+- [x] scraping SHS100K dataset
 
 ### W7 (25.11-1.12.2024)
 
