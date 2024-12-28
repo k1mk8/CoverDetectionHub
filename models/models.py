@@ -17,10 +17,11 @@ from models.CoverHunter.src.cqt import PyCqt  # Assuming PyCqt is available in t
 import numpy as np
 import torchaudio
 
-from preprocessing import *
+from preprocessing import preprocess_audio, preprocess_audio_coverhunter
 
 # Configuration
-BYTECOVER_CHECKPOINT_PATH = "models/bytecover/models/orfium-bytecover.pt"
+# BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/orfium-bytecover.pt"
+BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/bytecover_run4.pt"
 TARGET_SR = 22050
 MAX_LEN = 100
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -53,8 +54,10 @@ def compute_similarity_bytecover(song1_path, song2_path, model):
 
 
 # Configuration
-COVERHUNTER_CONFIG_PATH = "./models/CoverHunter/pretrain_model/config/hparams.yaml"
-COVERHUNTER_CHECKPOINT_DIR = "./models/CoverHunter/pretrain_model/pt_model"
+# COVERHUNTER_CONFIG_PATH = "./models/checkpoints/CoverHunter/pretrain_model/config/hparams.yaml"
+# COVERHUNTER_CHECKPOINT_DIR = "./models/checkpoints/CoverHunter/pretrain_model/pt_model"
+COVERHUNTER_CONFIG_PATH = "./models/checkpoints/CoverHunter/our_model/config/hparams.yaml"
+COVERHUNTER_CHECKPOINT_DIR = "./models/checkpoints/CoverHunter/our_model/pt_model"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load CoverHunter Model

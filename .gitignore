@@ -163,3 +163,4 @@ cython_debug/
 
 wimu*/
 data/*
+models/checkpoints/*

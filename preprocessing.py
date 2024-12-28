@@ -2,6 +2,7 @@ import librosa
 import torchaudio
 import torch
 from models.CoverHunter.src.cqt import PyCqt
+import numpy as np
 
 TARGET_SR = 22050
 MAX_LEN = 100

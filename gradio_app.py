@@ -11,7 +11,6 @@ from models.utils import is_cover_song, test_model_on_dataset
 bytecover_model = load_bytecover_model()
 coverhunter_model = load_coverhunter_model()
 
-
 # Gradio Interface for CoverHunter Integration
 def gradio_cover_interface(audio1, audio2, model_name):
     if model_name == "ByteCover":
@@ -26,7 +25,7 @@ def gradio_cover_interface(audio1, audio2, model_name):
     
     # Determine cover or not based on similarity
     result = "Cover" if similarity >= threshold else "Not a Cover"
-    return result, f"Similarity Score: {similarity:}"
+    return result, f"Similarity Score: {similarity:.2f}"
 
 # Gradio app setup for dataset testing
 def gradio_test_interface(model_name, dataset):
@@ -37,6 +36,14 @@ def gradio_test_interface(model_name, dataset):
         f"Mean Rank of First Correct Cover (MR1): {results['Mean Rank of First Correct Cover (MR1)']}"
     )
     return summary_table
+
+# Example data for Cover Song Identification
+examples = [
+    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover"],
+    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter"],
+    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover"],
+    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter"],
+]
 
 # Gradio UI
 app1 = gr.Interface(
@@ -51,7 +58,8 @@ app1 = gr.Interface(
         gr.Textbox(label="Similarity Score")
     ],
     title="Cover Song Identification Hub",
-    description="Upload two audio files to check if they are covers of each other. Select the desired CSI model from the dropdown."
+    description="Upload two audio files to check if they are covers of each other. Select the desired CSI model from the dropdown.",
+    examples=examples
 )
 
 app2 = gr.Interface(
