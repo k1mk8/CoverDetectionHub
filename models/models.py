@@ -46,9 +46,11 @@ def compute_similarity_bytecover(song1_path, song2_path, model):
         features1 = model(song1)
         features2 = model(song2)
 
-    embedding1 = features1["f_t"]
-    embedding2 = features2["f_t"]
+    # Extract and normalize embeddings
+    embedding1 = torch.nn.functional.normalize(features1["f_t"], p=2, dim=1)
+    embedding2 = torch.nn.functional.normalize(features2["f_t"], p=2, dim=1)
 
+    # Compute cosine similarity
     similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
     return similarity.item()
 
@@ -141,3 +143,33 @@ def compute_similarity_remove(audio1_path, audio2_path, model):
     # Compute cosine similarity
     similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
     return similarity.item()
+
+
+def compute_batch_similarity_bytecover(batch_a_paths, batch_b_paths, model):
+    batch_a = torch.stack([preprocess_audio(path).unsqueeze(0) for path in batch_a_paths]).to(DEVICE)
+    batch_b = torch.stack([preprocess_audio(path).unsqueeze(0) for path in batch_b_paths]).to(DEVICE)
+
+    with torch.no_grad():
+        features_a = model(batch_a)
+        features_b = model(batch_b)
+
+    embeddings_a = features_a["f_t"]
+    embeddings_b = features_b["f_t"]
+
+    # Compute cosine similarity for each pair in the batch
+    similarities = torch.nn.functional.cosine_similarity(embeddings_a, embeddings_b)
+    return similarities.cpu().tolist()
+
+# Batch processing for CoverHunter
+
+def compute_batch_similarity_coverhunter(batch_a_paths, batch_b_paths, model):
+    batch_a = torch.stack([preprocess_audio_coverhunter(path) for path in batch_a_paths]).to(DEVICE)
+    batch_b = torch.stack([preprocess_audio_coverhunter(path) for path in batch_b_paths]).to(DEVICE)
+
+    with torch.no_grad():
+        embeddings_a = model(batch_a)
+        embeddings_b = model(batch_b)
+
+    # Compute cosine similarity for each pair in the batch
+    similarities = torch.nn.functional.cosine_similarity(embeddings_a, embeddings_b)
+    return similarities.cpu().tolist()
