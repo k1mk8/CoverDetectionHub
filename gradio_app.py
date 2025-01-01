@@ -44,10 +44,10 @@ def gradio_test_interface(model_name, dataset, threshold):
 
 # Example data for Cover Song Identification
 examples = [
-    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.99],
-    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter", 0.9],
-    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover", 0.99],
-    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter", 0.9],
+    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.998],
+    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter", 0.8],
+    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover", 0.998],
+    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter", 0.8],
 ]
 
 # Gradio UI
