@@ -1,3 +1,8 @@
+'''
+Audio files converter for CoverHunter (https://github.com/Liu-Feng-deeplearning/CoverHunter) model.
+Our scraped datased is in m4a format with sr = 22.5kHz, so we needed to convert the files into wav format
+and resample it to 16kHz up to the model requirements.
+'''
 import os
 import ffmpeg
 import librosa
