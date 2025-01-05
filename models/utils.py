@@ -5,7 +5,7 @@ import random
 import gradio as gr
 
 import os
-
+import pandas as pd
 from models.models import compute_batch_similarity_bytecover, compute_batch_similarity_coverhunter, compute_similarity_bytecover, compute_similarity_coverhunter, load_bytecover_model, load_coverhunter_model
 
 # Load audio for other models
@@ -178,6 +178,103 @@ def evaluate_on_covers80(model_name, threshold=0.99, covers80but10=False, progre
         "Mean Rank of First Correct Cover (MR1)": mr1,
         "Total Covers Predicted Correctly": predicted_correct_count,
         "Total Pairs (Ground Truth Covers)": total_relevant,
+        "Threshold Used": threshold
+    }
+
+    return summary_metrics
+
+
+
+def evaluate_on_injected_abracadabra(model_name, threshold=0.99, progress=gr.Progress()):
+    # Paths
+    dataset_path = "datasets/injected_abracadabra/mix/"
+    ground_truth_file = "datasets/injected_abracadabra/injection_list.csv"
+    reference_song = "datasets/injected_abracadabra/steve_miller_band+Steve_Miller_Band_Live_+09-Abracadabra.mp3.wav"
+
+    # Load ground truth
+    injection_data = pd.read_csv(ground_truth_file)
+    injection_dict = dict(zip(injection_data['File'].str.replace("\\", "/"), injection_data['Injected'].map(lambda x: x == 'Yes')))
+
+    # Load model and similarity function
+    if model_name == "ByteCover":
+        model = load_bytecover_model()
+        similarity_function = compute_similarity_bytecover  # No batching
+    elif model_name == "CoverHunter":
+        model = load_coverhunter_model()
+        similarity_function = compute_similarity_coverhunter  # No batching
+    elif model_name in ["MFCC", "Spectral Centroid"]:
+        similarity_function = lambda a, b, _: compute_similarity(a, b, model_name)
+        model = None  # Not used for MFCC or Spectral Centroid
+    else:
+        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, MFCC, or Spectral Centroid.")
+
+    # Collect all audio files in mix folder
+    all_audio_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith(".wav")]
+
+    # Initialize results
+    results = []
+    total_files = len(all_audio_files)
+    progress(0, desc="Initializing comparisons")
+
+    for idx, song_path in enumerate(all_audio_files):
+        # Compute similarity between current song and reference song
+        similarity = similarity_function(song_path, reference_song, model)
+
+        ground_truth_key = os.path.relpath(song_path, start="datasets/injected_abracadabra").replace("\\", "/")
+
+        ground_truth = injection_dict.get(ground_truth_key, False)  # Ground truth
+
+        is_cover = similarity >= threshold  # Predicted cover
+
+        # Print comparison details
+        print(f"Comparison {idx + 1}/{total_files}")
+        print(f"  Song: {song_path}")
+        print(f"  Similarity: {similarity:.4f}")
+        print(f"  Predicted Cover: {'Yes' if is_cover else 'No'}")
+        print(f"  Ground Truth Cover: {'Yes' if ground_truth else 'No'}\n")
+
+        results.append({
+            "song": song_path,
+            "similarity": similarity,
+            "is_cover": is_cover,       # Predicted label
+            "ground_truth": ground_truth
+        })
+
+        progress((idx + 1) / total_files, desc="Evaluating files")
+
+    # Sort by similarity (descending)
+    results.sort(key=lambda x: x["similarity"], reverse=True)
+
+    # Precision@10
+    top_10 = results[:10]
+    p_at_10 = sum(1 for r in top_10 if r["is_cover"] == r["ground_truth"]) / len(top_10) if len(top_10) > 0 else 0
+
+    # Mean Rank of First Correct Cover (MR1)
+    first_correct_ranks = [i + 1 for i, r in enumerate(results) if r["is_cover"] and r["ground_truth"]]
+    mr1 = sum(first_correct_ranks) / len(first_correct_ranks) if first_correct_ranks else float('inf')
+
+    # mAP Calculation
+    total_relevant = sum(1 for r in results if r["ground_truth"])
+    predicted_correct_count = 0
+    precision_sum = 0
+
+    for i, r in enumerate(results):
+        if r["is_cover"] and r["ground_truth"]:  # Correctly predicted as cover
+            predicted_correct_count += 1
+            precision_at_i = predicted_correct_count / (i + 1)
+            precision_sum += precision_at_i
+
+    if total_relevant > 0:
+        mAP = precision_sum / total_relevant
+    else:
+        mAP = 0
+
+    summary_metrics = {
+        "Mean Average Precision (mAP)": mAP,
+        "Precision at 10 (P@10)": p_at_10,
+        "Mean Rank of First Correct Cover (MR1)": mr1,
+        "Total Covers Predicted Correctly": predicted_correct_count,
+        "Total Files (Ground Truth Covers)": total_relevant,
         "Threshold Used": threshold
     }
 
