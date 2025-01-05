@@ -1,4 +1,5 @@
 import gradio as gr
+from audio_utils import preprocess_audio
 from models.models import (
     load_bytecover_model,
     load_coverhunter_model,
@@ -10,12 +11,26 @@ import librosa
 import numpy as np
 from scipy.spatial.distance import cosine
 
+from preprocessing import InvalidMediaFileError, validate_audio
+
 # Load ByteCover model
 bytecover_model = load_bytecover_model()
 coverhunter_model = load_coverhunter_model()
 
 # Gradio Interface for CoverHunter Integration
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
+    try:
+        # Validate and preprocess audio files
+        audio1, error1 = validate_audio(audio1)
+        if error1:
+            return f"Error with Query Song: {error1}", ""
+
+        audio2, error2 = validate_audio(audio2)
+        if error2:
+            return f"Error with Potential Cover Song: {error2}", ""
+    except InvalidMediaFileError as e:
+        return str(e), ""
+
     if model_name == "ByteCover":
         similarity = compute_similarity_bytecover(audio1, audio2, bytecover_model)
     elif model_name == "CoverHunter":

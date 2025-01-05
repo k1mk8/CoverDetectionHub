@@ -75,3 +75,52 @@ def preprocess_audio_coverhunter(file_path, target_sr=16000, max_len=100):
     csi_tensor = torch.tensor(csi_features, dtype=torch.float32).unsqueeze(0)  # Shape: [1, frame_size, feat_size]
 
     return csi_tensor.to(DEVICE)
+
+
+import ffmpeg
+import os
+
+class InvalidMediaFileError(Exception):
+    """Exception raised when the input file is not a valid media file."""
+    pass
+
+def validate_audio(filepath):
+    """
+    Validates and preprocesses an audio file.
+
+    Parameters:
+        filepath (str): Path to the input file.
+
+    Returns:
+        tuple: (processed_filepath, error_message)
+        - processed_filepath: Path to the processed audio file, or None if invalid.
+        - error_message: Error message if the file is invalid, or None if valid.
+
+    Raises:
+        InvalidMediaFileError: If the file is not a valid media file.
+    """
+    # Probe the file using ffmpeg
+    try:
+        probe = ffmpeg.probe(filepath)
+    except ffmpeg.Error:
+        raise InvalidMediaFileError("The file is not a valid media file or cannot be processed.")
+
+    format_info = probe.get("format", {})
+    duration = float(format_info.get("duration", 0))
+    size = float(format_info.get("size", 0)) / (1024 * 1024)  # Convert size to MB
+
+    # Reject if file is too large or too long
+    if size > 100:
+        return None, "File is too large (over 100MB)."
+    if duration > 20 * 60:  # 20 minutes
+        return None, "File is too long (over 20 minutes)."
+
+    # Check if it's already an audio file
+    audio_streams = [stream for stream in probe.get("streams", []) if stream.get("codec_type") == "audio"]
+    if len(audio_streams) > 0:
+        return filepath, None
+
+    # If it's a video file, extract audio and convert to WAV with sr=16k
+    output_filepath = os.path.splitext(filepath)[0] + ".wav"
+    ffmpeg.input(filepath).output(output_filepath, format="wav", ac=1, ar="16000").run(overwrite_output=True)
+    return output_filepath, None
