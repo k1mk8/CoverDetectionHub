@@ -31,6 +31,8 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
 def gradio_test_interface(model_name, dataset, threshold):
     if dataset == "Covers80":
         results = evaluate_on_covers80(model_name, threshold)
+    elif dataset == "Covers80but10":
+        results = evaluate_on_covers80(model_name, threshold, covers80but10=True)
     else:
         results = test_model_on_dataset(model_name, dataset)
 
@@ -71,8 +73,8 @@ app1 = gr.Interface(
 app2 = gr.Interface(
     fn=gradio_test_interface,
     inputs=[
-        gr.Dropdown(choices=["ByteCover", "CoverHunter", "MFCC", "Spectral Centroid"], value="Model 1", label="Choose CSI Model"),
-        gr.Dropdown(choices=["Dataset A", "Dataset B", "Dataset C", "Covers80"], value="Dataset A", label="Choose Dataset"),
+        gr.Dropdown(choices=["ByteCover", "CoverHunter", "MFCC", "Spectral Centroid"], value="ByteCover", label="Choose CSI Model"),
+        gr.Dropdown(choices=["Covers80", "Covers80but10"], value="Covers80", label="Choose Dataset"),
         gr.Slider(minimum=0.5, maximum=1.0, step=0.0001, value=0.99, label="Threshold")
     ],
     outputs=[

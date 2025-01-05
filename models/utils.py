@@ -76,8 +76,11 @@ def compute_similarity(audio1_path, audio2_path, model_name):
 
     return 1 - cosine(features1, features2)
 
-def evaluate_on_covers80(model_name, threshold=0.99, progress=gr.Progress()):
-    dataset_path = "datasets/covers80/coversongs/covers32k/"
+def evaluate_on_covers80(model_name, threshold=0.99, covers80but10=False, progress=gr.Progress()):
+    if covers80but10:
+        dataset_path = "datasets/covers80but10/coversongs/covers32k/"
+    else:
+        dataset_path = "datasets/covers80/coversongs/covers32k/"
     results = []
 
     if model_name == "ByteCover":
