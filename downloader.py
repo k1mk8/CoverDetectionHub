@@ -7,60 +7,63 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 import logging
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Download audio files using YouTube IDs from metadata.")
+    parser = argparse.ArgumentParser(
+        description="Download audio files using YouTube IDs from metadata."
+    )
     parser.add_argument(
         "--csv_path",
         type=str,
         default="./bytecover/data/interim/shs100k.csv",
-        help="Path to the metadata CSV file containing video IDs and metadata."
+        help="Path to the metadata CSV file containing video IDs and metadata.",
     )
     parser.add_argument(
         "--output_dir",
         type=str,
         default="./bytecover/data/shs100k",
-        help="Directory where the downloaded audio files will be saved."
+        help="Directory where the downloaded audio files will be saved.",
     )
     parser.add_argument(
         "--train_ids_path",
         type=str,
         default="./bytecover/data/splits/train_ids.npy",
-        help="Path to the NumPy file containing training IDs."
+        help="Path to the NumPy file containing training IDs.",
     )
     parser.add_argument(
         "--val_ids_path",
         type=str,
         default="./bytecover/data/splits/val_ids.npy",
-        help="Path to the NumPy file containing validation IDs."
+        help="Path to the NumPy file containing validation IDs.",
     )
     parser.add_argument(
         "--test_ids_path",
         type=str,
         default="./bytecover/data/splits/test_ids.npy",
-        help="Path to the NumPy file containing test IDs."
+        help="Path to the NumPy file containing test IDs.",
     )
     parser.add_argument(
         "--num_threads",
         type=int,
         default=16,
-        help="Number of threads to use for downloading. Default is 16."
+        help="Number of threads to use for downloading. Default is 16.",
     )
     parser.add_argument(
         "--sample_size",
         type=int,
         default=50,
-        help="Number of files to download from the metadata. Default is 50."
+        help="Number of files to download from the metadata. Default is 50.",
     )
     return parser.parse_args()
+
 
 def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler()
-        ]
+        handlers=[logging.StreamHandler()],
     )
+
 
 def download_audio(row, ydl_opts, output_dir):
     """
@@ -91,6 +94,7 @@ def download_audio(row, ydl_opts, output_dir):
         return f"Download succeeded but no MP3 found for {video_id}"
     except Exception as e:
         return f"Failed to download {video_id}: {e}"
+
 
 def main():
     args = parse_args()
@@ -129,11 +133,15 @@ def main():
 
     with ThreadPoolExecutor(max_workers=args.num_threads) as executor:
         futures = {
-            executor.submit(download_audio, row, ydl_opts, args.output_dir): row["Video ID"]
+            executor.submit(download_audio, row, ydl_opts, args.output_dir): row[
+                "Video ID"
+            ]
             for _, row in filtered_metadata.iterrows()
         }
 
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Downloading Audio"):
+        for future in tqdm(
+            as_completed(futures), total=len(futures), desc="Downloading Audio"
+        ):
             try:
                 results.append(future.result())
             except Exception as e:
@@ -141,6 +149,7 @@ def main():
 
     for result in results:
         logging.info(result)
+
 
 if __name__ == "__main__":
     main()
