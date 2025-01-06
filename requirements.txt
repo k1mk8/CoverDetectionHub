@@ -15,3 +15,4 @@ wandb
 typeguard==2.13.3
 gradio
 librosa
+openai-whisper

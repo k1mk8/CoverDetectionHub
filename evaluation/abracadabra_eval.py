@@ -7,6 +7,7 @@ import gradio as gr
 import yaml
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
 from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
+from csi_models.lyricover_utils import compute_similarity_lyricover, load_lyricover_model
 from evaluation.metrics import calculate_mean_average_precision, calculate_mean_rank_of_first_correct_cover, calculate_precision_at_k
 from feature_extraction.feature_extraction import compute_similarity
 from utils.logging_config import logger
@@ -98,12 +99,16 @@ def evaluate_on_injected_abracadabra(model_name, threshold=0.99, progress=gr.Pro
         model = load_coverhunter_model()
         def similarity_function(a, b):
             return compute_similarity_coverhunter(a, b, model)
+    elif model_name == "Lyricover":
+        model = load_lyricover_model()
+        def similarity_function(a, b):
+            return compute_similarity_lyricover(a, b, model)
     elif model_name in ["MFCC", "Spectral Centroid"]:
         def similarity_function(a, b):
             return compute_similarity(a, b, model_name)
         model = None
     else:
-        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, MFCC, or Spectral Centroid.")
+        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid.")
 
     # Gather and compute
     files_with_ground_truth = gather_injected_abracadabra_files(dataset_path, ground_truth_file)
