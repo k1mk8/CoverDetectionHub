@@ -2,11 +2,146 @@
 
 Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
 
+---
+
 ## Project description
 
-The aim of the project is to prepare a framework for music cover detection. The main assumption is to implement a "hub" that lets researchers carry out various experiments in this field as well as compare different Music Information Retrieval (MIR) methods.
 
-## Bibliography review
+A framework and “hub” for **music cover identification**, enabling researchers to compare various CSI methods and run experiments through a user-friendly Gradio interface.
+
+---
+
+## Table of Contents
+1. [Setup Instructions](#setup-instructions)
+2. [Project Overview](#project-overview)
+3. [Technology Stack](#technology-stack)
+4. [Models Implemented](#models-implemented)
+6. [Available Datasets](#available-datasets)
+7. [Gradio App Usage](#gradio-app-usage)
+8. [Experiments and Tests](#experiments-and-tests)
+9. [Bibliography Review](#bibliography-review)
+
+
+---
+
+## Setup Instructions
+
+1. **Clone or Download** this repository:
+   ```bash
+   git clone https://github.com/cncPomper/CoverDetectionHub.git
+   cd CoverDetectionHub
+   ```
+
+2. Create and Activate a Virtual Environment (optional but recommended):
+   ```bash
+   # Create a virtual environment (Linux/macOS)
+   python -m venv venv
+   source venv/bin/activate
+
+   # On Windows
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+
+3. Install Dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Download or Place Model Checkpoints:
+ - Certain models (ByteCover, CoverHunter, Lyricover) require large checkpoint files that are not included in this repo. Here you will find checkpoints to download.
+ - Update or create `configs/paths.yaml` to point to where you store these checkpoints.
+
+5. Prepare Datasets:
+  - Datasets are available to download here.
+  - Update or create `configs/paths.yaml` to point to provide paths for datasets.
+   
+## Project Overview
+
+This project is part of a Music Information Retrieval (MIR) course. We developed a hub for cover detection, providing:
+
+- A unified interface to compare different cover detection models.
+- Experiments for evaluating effectiveness on known cover-song datasets.
+- A fast, user-friendly GUI using Gradio.
+
+### Original Scope
+Initially, we planned to use the Da-TACOS dataset. However, we pivoted to using SHS100k for training models due to practical constraints. For experiments, we focus on Covers80 and synthetic datasets derived from it.
+
+## Technology stack
+Main technologies in use:
+- **Python**: Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way.
+- **PyTorch**: Deep learning library.
+- **Gradio**: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
+- **Numpy**: Library for maths operations.
+- **Librosa**: Used for audio loading and some feature extraction (MFCC, spectral centroid) in the simpler comparison methods.
+- **venv** (or other tool): For making the project portable in an easy way
+- **OpenAI Whisper**: Used by Lyricover to transcribe lyrics and measure similarity in lyric space.
+
+## Models Implemented 
+We currently have 3 main cover-detection models:
+
+1. ByteCover:
+- A neural-based approach, leveraging specialized embeddings for audio.
+- Checkpoints are loaded from bytecover_checkpoint_path.
+  
+2. CoverHunter:
+- Another deep learning–based model, configured via a YAML file and checkpoint directory.
+- Paths in paths.yaml guide where to load the model weights.
+
+3. Lyricover:
+- Inspired by the paper "The Words Remain the Same: Cover Detection with Lyrics Transcription".
+- It incorporates lyric transcription (via Whisper) and tonal features to gauge similarity.
+Each of these models outputs a similarity score for a given pair of audio files. A threshold then decides if two songs are considered “covers.”
+
+### Feature Extraction Methods
+Apart from the main deep-learning models, we also included two simpler methods for demonstration and baseline comparison:
+
+MFCC (Mel-Frequency Cepstral Coefficients)
+Spectral Centroid
+These can be used to compare two audio files based on feature similarity (e.g., cosine similarity).
+
+## Available Datasets
+The hub includes references to the following datasets:
+
+1. Covers80
+A standard collection used in many cover-song identification studies.
+
+2. Covers80but10
+A smaller variant with only 10 songs (for quick testing).
+
+3. Injected Abracadabra
+A synthetic dataset where a portion of “Abracadabra” by Steve Miller Band is injected into other audio samples, as described in [Batlle-Roca et al.](https://arxiv.org/pdf/2407.14364).
+
+**Note: The actual training of ByteCover, CoverHunter, and Lyricover was performed on SHS100k, using a university server with GPU machines. The Covers80-related datasets are primarily for testing and demonstration.**
+
+## Gradio App Usage
+
+After installing dependencies and ensuring your checkpoints/datasets exist:
+
+Launch the Gradio interface:
+   ```bash
+   python gradio_app.py
+   ```
+
+A browser tab should open with two tabs:
+1. Cover Song Identification
+ - Upload two audio files (e.g., .mp3), select a model (ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid), and set a threshold.
+ - The interface will compute a similarity score and return whether it considers them covers.
+2. Model Testing
+   - Choose a CSI model (ByteCover, CoverHunter, MFCC, Spectral Centroid).
+   - Pick a dataset (Covers80, Covers80but10, or Injected Abracadabra).
+   - Select a threshold. The system then computes evaluation metrics (mAP, Precision@10, MR1, etc.) on that dataset, printing a summary.
+
+
+## Experiments and Tests
+1. Synthetic Injection (“Injected Abracadabra”)
+   - Based on the partial injection method from [Batlle-Roca et al.](https://arxiv.org/pdf/2407.14364).
+  - We inject a segment of an original piece (Abracadabra) into other tracks to create partial covers, then measure how well each model detects the covers.
+
+2. Unit Tests
+   - We maintain a `tests/` directory with `pytest` test files
+
+## Bibliography Review
 
 ### Cover song detection methods
 
@@ -26,43 +161,7 @@ The aim of the project is to prepare a framework for music cover detection. The 
 | [SHS100K](http://millionsongdataset.com/secondhand/) | <li> Contains metadata and audio features for a large number of songs and their covers. </li> <li> Includes a diverse range of musical genres </li>   <li> Metadata: song title, artist, release year </li> <li> Audio features: chroma, key, tempo, and others related to music structure and timbre. </li> <br> Thoughts: Another benchmark for cover detection task. We will consider it as a secodary dataset. |
 | [ZAIKS dataset](https://zaiks.org.pl/) | It's a friendly organization in Poland. The organization will provide a music dataset for testing purposes - these will probably be Polish songs and their famous cover versions. |
 
-
-## Technology stack
-Main technologies in use:
-- **Python**: Our proposed technology stack is based on Python, considering its great capabilities for working with data in an easy way. 
-- **Gradio**: User interface will be implemented in Gradio library, because it is a very convenient tool for a fast prototype building.
-- **Numpy**: Library for maths operations.
-- **PyTorch**: Deep learning library.
-- **essentia**: A versatile tool for MIR operations
-- **venv** (or other tool): For making the project portable in an easy way
-
-Probably there will appear more libraries, strictly from MIR domain, which we will get to know during project development.
-
-
-## Planned functionality of the hub
-- Comparing two songs and returning the similarity score
-- User-friendly access via GUI
-- Testing CSI methods on Da-TACOS dataset
-- Choosing between methods
-- Report on evaluation and calculated metrics
-
-## Dataset for experiments
-
-We intend to use Da-TACOS dataset (https://github.com/MTG/da-tacos) because of its versatility, decent size and excellent metadata structure. It is organised into cliques that gather an original performance along with its covers, which fits perfectly into our needs.
-
-In future extensions, utilising a dataset delivered by the Polish Society of Authors ZAiKS is possible.
-
-## Experiment scope
-
-In the initial phase of the project, it is intended to perform 1-1 comparisons for checking the similarity rate.
-
-For the evaluation of analysed methods, there are proposed 2 experiments:
-
-- synthetic generation of samples, where a defined percentage of an original piece is injected into a totally different sample (Batlle-Roca et al., https://arxiv.org/pdf/2407.14364)
-- direct comparison between two samples, where 2 full samples are processed. 
-
-## Computing resources
-To train and run deep learning models, our project will need GPU devices. So far, we gathered two seperate units: RTX3090Ti and RTX2060.
+---
 
 ## Project schedule
 ### W1 (14-20.10.2024)
@@ -86,28 +185,28 @@ To train and run deep learning models, our project will need GPU devices. So far
 
 ### W5-W6 (11-24.11.2024)
 
-- [ ] First results evaluation
+- [x] First results evaluation
 - [x] implementing improvements
 - [x] training
-- [ ] adding subsequent models
+- [x] adding subsequent models
 - [x] scraping SHS100K dataset
 
 ### W7 (25.11-1.12.2024)
 
-- [ ] Automated tests design
-- [ ] training of remaining models
+- [x] Automated tests design
+- [x] training of remaining models
 
 ### W8-W9 (02-15.12.2024)
 
-- [ ] Evaluation of the results
-- [ ] improving GUI
-- [ ] re-training the models if necessary
+- [x] Evaluation of the results
+- [x] improving GUI
+- [x] re-training the models if necessary
 
 ### W10-W12 (16.12.2024-05.01.2025)
 
-- [ ] Working on the final presentation
-- [ ] tests
-- [ ] gathering final results, Bożenarodzeniowy chill (optional)
+- [x] Working on the final presentation
+- [x] tests
+- [x] gathering final results, Bożenarodzeniowy chill (optional)
 
 ### W13 (06-13.01.2025)
 
