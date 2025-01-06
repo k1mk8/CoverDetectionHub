@@ -6,6 +6,7 @@ import yaml
 
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
 from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
+from csi_models.lyricover_utils import compute_similarity_lyricover, load_lyricover_model
 from feature_extraction.feature_extraction import compute_similarity
 from evaluation.metrics import calculate_mean_average_precision, calculate_mean_rank_of_first_correct_cover, calculate_precision_at_k
 from utils.logging_config import logger
@@ -88,7 +89,7 @@ def compute_covers80_results(files_and_labels, similarity_function, threshold, p
 
 def evaluate_on_covers80(model_name, threshold=0.99, covers80but10=False, progress=gr.Progress()):
     """
-    Evaluate any of the four models (ByteCover, CoverHunter, MFCC, Spectral Centroid)
+    Evaluate any of the five models (ByteCover, CoverHunter, Lyricover, MFCC, Spectral Centroid)
     on the covers80 or covers80but10 dataset.
     """
     if covers80but10:
@@ -105,13 +106,17 @@ def evaluate_on_covers80(model_name, threshold=0.99, covers80but10=False, progre
         model = load_coverhunter_model()
         def similarity_function(a, b):
             return compute_similarity_coverhunter(a, b, model)
+    elif model_name == "Lyricover":
+        model = load_lyricover_model()
+        def similarity_function(a, b):
+            return compute_similarity_lyricover(a, b, model)
     elif model_name in ["MFCC", "Spectral Centroid"]:
         # We pass model_name in closure
         def similarity_function(a, b):
             return compute_similarity(a, b, model_name)
         model = None
     else:
-        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, MFCC, or Spectral Centroid.")
+        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC or Spectral Centroid.")
 
     # Gather data and compute results
     files_and_labels = gather_covers80_dataset_files(dataset_path)

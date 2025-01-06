@@ -2,6 +2,10 @@ from feature_extraction.audio_preprocessing import validate_audio, InvalidMediaF
 from feature_extraction.feature_extraction import compute_similarity
 from csi_models.bytecover_utils import load_bytecover_model, compute_similarity_bytecover
 from csi_models.coverhunter_utils import load_coverhunter_model, compute_similarity_coverhunter
+from csi_models.lyricover_utils import (
+    load_lyricover_model,
+    compute_similarity_lyricover
+)
 
 from evaluation.covers80_eval import evaluate_on_covers80
 from evaluation.abracadabra_eval import evaluate_on_injected_abracadabra
@@ -9,6 +13,7 @@ from evaluation.abracadabra_eval import evaluate_on_injected_abracadabra
 
 bytecover_model = load_bytecover_model()
 coverhunter_model = load_coverhunter_model()
+lyricover_model = load_lyricover_model(instrumental_threshold=8)
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
     """
@@ -31,6 +36,8 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
         similarity = compute_similarity_bytecover(audio1, audio2, bytecover_model)
     elif model_name == "CoverHunter":
         similarity = compute_similarity_coverhunter(audio1, audio2, coverhunter_model)
+    elif model_name == "Lyricover":
+        similarity = compute_similarity_lyricover(audio1, audio2, lyricover_model)
     else:
         # For MFCC or Spectral Centroid
         similarity = compute_similarity(audio1, audio2, model_name)
