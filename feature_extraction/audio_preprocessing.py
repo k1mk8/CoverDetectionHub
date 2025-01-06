@@ -1,12 +1,14 @@
 import librosa
 import torchaudio
 import torch
-from csi_models.CoverHunter.src.cqt import PyCqt
 import numpy as np
+from feature_extraction.feature_extraction import extract_features_cqt
 
 TARGET_SR = 22050
 MAX_LEN = 100
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
 
 # Preprocess audio
 def preprocess_audio(file_path, target_sr=TARGET_SR, max_len=MAX_LEN):
@@ -44,11 +46,11 @@ def preprocess_audio_coverhunter(file_path, target_sr=16000, max_len=100):
     resample = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
     waveform = resample(waveform)
 
-    # Step 2: Convert to Mono
+    # Convert to Mono
     if waveform.size(0) > 1:  # If stereo, average channels to create mono
         waveform = waveform.mean(dim=0, keepdim=True)
 
-    # Step 3: Trim or Pad Audio to max_len
+    # Trim or Pad Audio to max_len
     max_samples = target_sr * max_len
     if waveform.size(1) > max_samples:
         waveform = waveform[:, :max_samples]
@@ -56,25 +58,17 @@ def preprocess_audio_coverhunter(file_path, target_sr=16000, max_len=100):
         pad = max_samples - waveform.size(1)
         waveform = torch.nn.functional.pad(waveform, (0, pad))
 
-    # Step 4: Normalize Audio
+    # Normalize Audio
     waveform_np = waveform.squeeze(0).numpy()  # Convert to NumPy for compatibility with PyCqt
     waveform_np = waveform_np / max(0.001, np.max(np.abs(waveform_np))) * 0.999
 
-    # Step 5: Extract CSI Features using PyCqt
-    py_cqt = PyCqt(
-        sample_rate=target_sr,
-        hop_size=0.04,  # Match hop_size in hparams.yaml
-        octave_resolution=12,  # Adjust bins per octave if needed
-        min_freq=32,  # Adjust based on the dataset configuration
-        max_freq=target_sr // 2  # Nyquist frequency
-    )
-    csi_features = py_cqt.compute_cqt(signal_float=waveform_np, feat_dim_first=False)
-    print(f"CQT spectrogram shape: {csi_features.shape}")  # Expect [frame_size, 101]
+    # Extract CSI Features using PyCqt
+    cqt = extract_features_cqt(audio_np=waveform_np,sample_rate=target_sr)
 
-    # Step 6: Add Batch Dimension
-    csi_tensor = torch.tensor(csi_features, dtype=torch.float32).unsqueeze(0)  # Shape: [1, frame_size, feat_size]
+    # Add Batch Dimension
+    cqt_tensor = torch.tensor(cqt, dtype=torch.float32).unsqueeze(0)  # Shape: [1, frame_size, feat_size]
 
-    return csi_tensor.to(DEVICE)
+    return cqt_tensor.to(DEVICE)
 
 
 import ffmpeg
