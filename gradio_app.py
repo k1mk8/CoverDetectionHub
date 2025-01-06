@@ -1,11 +1,11 @@
 import gradio as gr
-from models.models import (
+from csi_models.models import (
     load_bytecover_model,
     load_coverhunter_model,
     compute_similarity_bytecover,
     compute_similarity_coverhunter,
 )
-from models.utils import compute_similarity, evaluate_on_covers80, evaluate_on_injected_abracadabra
+from csi_models.utils import compute_similarity, evaluate_on_covers80, evaluate_on_injected_abracadabra
 
 from preprocessing import InvalidMediaFileError, validate_audio
 

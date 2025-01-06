@@ -7,7 +7,7 @@ import librosa
 import gradio as gr
 from scipy.spatial.distance import cosine
 
-from models.models import (
+from csi_models.models import (
     compute_batch_similarity_bytecover,
     compute_batch_similarity_coverhunter,
     compute_similarity_bytecover,

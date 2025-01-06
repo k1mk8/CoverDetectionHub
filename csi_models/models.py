@@ -4,16 +4,16 @@ import torch
 
 
 # Add CoverHunter directory to sys.path
-coverhunter_path = os.path.abspath("./models/CoverHunter")
+coverhunter_path = os.path.abspath("./csi_models/CoverHunter")
 if coverhunter_path not in sys.path:
     sys.path.insert(0, coverhunter_path)
 
 
-from models.bytecover.bytecover.models.modules import Bottleneck, Resnet50
-from models.CoverHunter.src.model import Model
-from models.CoverHunter.src.utils import load_hparams
+from csi_models.bytecover.bytecover.models.modules import Bottleneck, Resnet50
+from csi_models.CoverHunter.src.model import Model
+from csi_models.CoverHunter.src.utils import load_hparams
 from scipy.spatial.distance import cosine
-from models.CoverHunter.src.cqt import PyCqt  # Assuming PyCqt is available in the CoverHunter repo
+from csi_models.CoverHunter.src.cqt import PyCqt  # Assuming PyCqt is available in the CoverHunter repo
 import numpy as np
 import torchaudio
 
@@ -21,7 +21,7 @@ from preprocessing import preprocess_audio, preprocess_audio_coverhunter
 
 # Configuration
 # BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/orfium-bytecover.pt"
-BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/bytecover_run4.pt"
+BYTECOVER_CHECKPOINT_PATH = "csi_models/checkpoints/bytecover/bytecover_run4.pt"
 TARGET_SR = 22050
 MAX_LEN = 100
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -58,8 +58,8 @@ def compute_similarity_bytecover(song1_path, song2_path, model):
 # Configuration
 # COVERHUNTER_CONFIG_PATH = "./models/checkpoints/CoverHunter/pretrain_model/config/hparams.yaml"
 # COVERHUNTER_CHECKPOINT_DIR = "./models/checkpoints/CoverHunter/pretrain_model/pt_model"
-COVERHUNTER_CONFIG_PATH = "./models/checkpoints/CoverHunter/our_model/config/hparams.yaml"
-COVERHUNTER_CHECKPOINT_DIR = "./models/checkpoints/CoverHunter/our_model/pt_model"
+COVERHUNTER_CONFIG_PATH = "./csi_models/checkpoints/CoverHunter/our_model/config/hparams.yaml"
+COVERHUNTER_CHECKPOINT_DIR = "./csi_models/checkpoints/CoverHunter/our_model/pt_model"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load CoverHunter Model
@@ -114,7 +114,7 @@ def compute_similarity_coverhunter(audio1_path, audio2_path, model):
     return similarity.item()
 
 # Configuration
-REMOVE_CONFIG_PATH = "models/re-move/data/baseline_defaults.json"
+REMOVE_CONFIG_PATH = "csi_models/re-move/data/baseline_defaults.json"
 REMOVE_CHECKPOINT_DIR = ""
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
