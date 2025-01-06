@@ -7,3 +7,9 @@
 [submodule "models/re-move"]
 	path = models/re-move
 	url = https://github.com/furkanyesiler/re-move.git
+[submodule "models/LyriCover"]
+	path = models/lyricover
+	url = https://github.com/DawidRucinski/LyriCover.git
+[submodule "models/lyricover"]
+	path = models/lyricover
+	url = https://github.com/DawidRucinski/LyriCover.git
