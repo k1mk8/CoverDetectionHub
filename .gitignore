@@ -166,3 +166,4 @@ data/*
 models/checkpoints/*
 datasets/covers80/*
 datasets/covers80but10/*
+datasets/injected_abracadabra/*
