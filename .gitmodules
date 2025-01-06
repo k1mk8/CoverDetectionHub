@@ -1,15 +1,15 @@
 [submodule "models/bytecover"]
-	path = models/bytecover
+	path = csi_models/bytecover
 	url = https://github.com/Orfium/bytecover.git
 [submodule "models/CoverHunter"]
-	path = models/CoverHunter
+	path = csi_models/CoverHunter
 	url = https://github.com/Liu-Feng-deeplearning/CoverHunter.git
 [submodule "models/re-move"]
-	path = models/re-move
+	path = csi_models/re-move
 	url = https://github.com/furkanyesiler/re-move.git
 [submodule "models/LyriCover"]
 	path = models/lyricover
 	url = https://github.com/DawidRucinski/LyriCover.git
 [submodule "models/lyricover"]
-	path = models/lyricover
+	path = csi_models/lyricover
 	url = https://github.com/DawidRucinski/LyriCover.git
