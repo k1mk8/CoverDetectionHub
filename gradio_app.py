@@ -1,67 +1,11 @@
+# gradio_app.py
+
 import gradio as gr
-# from audio_utils import preprocess_audio
-from models.models import (
-    load_bytecover_model,
-    load_coverhunter_model,
-    compute_similarity_bytecover,
-    compute_similarity_coverhunter,
-)
-from models.utils import compute_similarity, evaluate_on_covers80, evaluate_on_injected_abracadabra
-import librosa
-import numpy as np
-from scipy.spatial.distance import cosine
 
-from preprocessing import InvalidMediaFileError, validate_audio
+# Import the two Gradio interface functions
+from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
-# Load ByteCover model
-bytecover_model = load_bytecover_model()
-coverhunter_model = load_coverhunter_model()
-
-# Gradio Interface for CoverHunter Integration
-def gradio_cover_interface(audio1, audio2, model_name, threshold):
-    try:
-        # Validate and preprocess audio files
-        audio1, error1 = validate_audio(audio1)
-        if error1:
-            return f"Error with Query Song: {error1}", ""
-
-        audio2, error2 = validate_audio(audio2)
-        if error2:
-            return f"Error with Potential Cover Song: {error2}", ""
-    except InvalidMediaFileError as e:
-        return str(e), ""
-
-    if model_name == "ByteCover":
-        similarity = compute_similarity_bytecover(audio1, audio2, bytecover_model)
-    elif model_name == "CoverHunter":
-        similarity = compute_similarity_coverhunter(audio1, audio2, coverhunter_model)
-    else:
-        similarity = compute_similarity(audio1, audio2, model_name)
-
-    # Determine cover or not based on similarity
-    result = "Cover" if similarity >= threshold else "Not a Cover"
-    return result, f"Similarity Score: {similarity}"
-
-# Gradio app setup for dataset testing
-def gradio_test_interface(model_name, dataset, threshold):
-    if dataset == "Covers80":
-        results = evaluate_on_covers80(model_name, threshold)
-    elif dataset == "Covers80but10":
-        results = evaluate_on_covers80(model_name, threshold, covers80but10=True)
-    elif dataset == "Injected Abracadabra":
-        results = evaluate_on_injected_abracadabra(model_name, threshold)
-    # else:
-    #     results = test_model_on_dataset(model_name, dataset)
-
-    summary_table = (
-        f"Mean Average Precision (mAP): {results.get('Mean Average Precision (mAP)', 'N/A')}\n"
-        f"Precision at 10 (P@10): {results.get('Precision at 10 (P@10)', 'N/A')}\n"
-        f"Mean Rank of First Correct Cover (MR1): {results.get('Mean Rank of First Correct Cover (MR1)', 'N/A')}"
-    )
-    summary_table += f"\nThreshold Used: {threshold}"
-    return summary_table
-
-# Example data for Cover Song Identification
+# Example usage (the same examples you had)
 examples = [
     ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.998],
     ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter", 0.8],
@@ -69,7 +13,6 @@ examples = [
     ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter", 0.8],
 ]
 
-# Gradio UI
 app1 = gr.Interface(
     fn=gradio_cover_interface,
     inputs=[
