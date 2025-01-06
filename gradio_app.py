@@ -1,5 +1,4 @@
 import gradio as gr
-# from audio_utils import preprocess_audio
 from models.models import (
     load_bytecover_model,
     load_coverhunter_model,
@@ -7,9 +6,6 @@ from models.models import (
     compute_similarity_coverhunter,
 )
 from models.utils import compute_similarity, evaluate_on_covers80, evaluate_on_injected_abracadabra
-import librosa
-import numpy as np
-from scipy.spatial.distance import cosine
 
 from preprocessing import InvalidMediaFileError, validate_audio
 
@@ -50,8 +46,7 @@ def gradio_test_interface(model_name, dataset, threshold):
         results = evaluate_on_covers80(model_name, threshold, covers80but10=True)
     elif dataset == "Injected Abracadabra":
         results = evaluate_on_injected_abracadabra(model_name, threshold)
-    # else:
-    #     results = test_model_on_dataset(model_name, dataset)
+
 
     summary_table = (
         f"Mean Average Precision (mAP): {results.get('Mean Average Precision (mAP)', 'N/A')}\n"
