@@ -4,11 +4,21 @@
 import os
 import pandas as pd
 import gradio as gr
+import yaml
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
 from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
 from evaluation.metrics import calculate_mean_average_precision, calculate_mean_rank_of_first_correct_cover, calculate_precision_at_k
 from feature_extraction.feature_extraction import compute_similarity
 from utils.logging_config import logger
+
+
+with open("configs/paths.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+INJECTED_ABRACADABRA_DIR = config["injected_abracadabra_dir"]
+INJECTED_ABRACADABRA_DATA_DIR = config["injected_abracadabra_data_dir"]
+GROUND_TRUTH_FILE = config["injected_abracadabra_ground_truth_file"]
+REFERENCE_SONG = config["injected_abracadabra_reference_song"]
 
 
 def gather_injected_abracadabra_files(dataset_path, ground_truth_file):
@@ -32,11 +42,15 @@ def gather_injected_abracadabra_files(dataset_path, ground_truth_file):
     # Build a list of (path, ground_truth_is_injected)
     files_with_ground_truth = []
     for path in all_audio_files:
-        # relative path for dictionary lookup
-        rel_path = os.path.relpath(path, start="datasets/injected_abracadabra").replace("\\", "/")
-        files_with_ground_truth.append((path, injection_dict.get(rel_path, False)))
+        
+        rel_path = os.path.relpath(path, start=INJECTED_ABRACADABRA_DIR).replace("\\", "/")
+
+        # Look up in injection_dict
+        is_injected = injection_dict.get(rel_path, False)
+        files_with_ground_truth.append((path, is_injected))
 
     return files_with_ground_truth
+
 
 def compute_injected_abracadabra_results(files_with_ground_truth, reference_song, similarity_function, threshold, progress=gr.Progress()):
     """
@@ -70,9 +84,10 @@ def compute_injected_abracadabra_results(files_with_ground_truth, reference_song
     return results
 
 def evaluate_on_injected_abracadabra(model_name, threshold=0.99, progress=gr.Progress()):
-    dataset_path = "datasets/injected_abracadabra/mix/"
-    ground_truth_file = "datasets/injected_abracadabra/injection_list.csv"
-    reference_song = "datasets/injected_abracadabra/steve_miller_band+Steve_Miller_Band_Live_+09-Abracadabra.mp3.wav"
+
+    dataset_path = INJECTED_ABRACADABRA_DATA_DIR
+    ground_truth_file = GROUND_TRUTH_FILE
+    reference_song = REFERENCE_SONG
 
     # Load model or define similarity function
     if model_name == "ByteCover":

@@ -1,20 +1,12 @@
-# utils/gradio_wrappers.py
-
-import torch
-import gradio as gr
-
-# Import your logic to validate audio
 from feature_extraction.audio_preprocessing import validate_audio, InvalidMediaFileError
-# Import your logic to compute similarity
 from feature_extraction.feature_extraction import compute_similarity
 from csi_models.bytecover_utils import load_bytecover_model, compute_similarity_bytecover
 from csi_models.coverhunter_utils import load_coverhunter_model, compute_similarity_coverhunter
 
-# Import your evaluation functions
 from evaluation.covers80_eval import evaluate_on_covers80
 from evaluation.abracadabra_eval import evaluate_on_injected_abracadabra
 
-# Pre-load the models (to avoid reloading each time a user queries)
+
 bytecover_model = load_bytecover_model()
 coverhunter_model = load_coverhunter_model()
 

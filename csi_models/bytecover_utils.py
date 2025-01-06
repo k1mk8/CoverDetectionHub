@@ -5,7 +5,13 @@ from feature_extraction.audio_preprocessing import preprocess_audio
 
 # Configuration
 # BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/orfium-bytecover.pt"
-BYTECOVER_CHECKPOINT_PATH = "csi_models/checkpoints/bytecover/bytecover_run4.pt"
+import yaml
+
+with open("configs/paths.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+BYTECOVER_CHECKPOINT_PATH = config["bytecover_checkpoint_path"]
+
 TARGET_SR = 22050
 MAX_LEN = 100
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

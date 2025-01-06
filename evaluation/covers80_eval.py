@@ -2,11 +2,19 @@
 
 import os
 import gradio as gr
+import yaml
+
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
 from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
 from feature_extraction.feature_extraction import compute_similarity
 from evaluation.metrics import calculate_mean_average_precision, calculate_mean_rank_of_first_correct_cover, calculate_precision_at_k
 from utils.logging_config import logger
+
+with open("configs/paths.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+COVERS80_DATA_DIR = config["covers80_data_dir"]
+COVERS80BUT10_DATA_DIR = config["covers80but10_data_dir"]
 
 
 def gather_covers80_dataset_files(dataset_path):
@@ -84,9 +92,9 @@ def evaluate_on_covers80(model_name, threshold=0.99, covers80but10=False, progre
     on the covers80 or covers80but10 dataset.
     """
     if covers80but10:
-        dataset_path = "datasets/covers80but10/coversongs/covers32k/"
+        dataset_path = COVERS80BUT10_DATA_DIR
     else:
-        dataset_path = "datasets/covers80/coversongs/covers32k/"
+        dataset_path = COVERS80_DATA_DIR
 
     # Load model or define similarity function
     if model_name == "ByteCover":

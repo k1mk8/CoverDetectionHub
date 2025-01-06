@@ -2,28 +2,24 @@
 import os
 import sys
 import torch
-from feature_extraction.audio_preprocessing import preprocess_audio_coverhunter
 
 # Add CoverHunter directory to sys.path
 coverhunter_path = os.path.abspath("./csi_models/CoverHunter")
 if coverhunter_path not in sys.path:
     sys.path.insert(0, coverhunter_path)
 
-
-from csi_models.bytecover.bytecover.models.modules import Bottleneck, Resnet50
+from feature_extraction.audio_preprocessing import preprocess_audio_coverhunter
 from csi_models.CoverHunter.src.model import Model
 from csi_models.CoverHunter.src.utils import load_hparams
-from scipy.spatial.distance import cosine
-from csi_models.CoverHunter.src.cqt import PyCqt  # Assuming PyCqt is available in the CoverHunter repo
-import numpy as np
-import torchaudio
+import yaml
 
 
-# Configuration
-# COVERHUNTER_CONFIG_PATH = "./models/checkpoints/CoverHunter/pretrain_model/config/hparams.yaml"
-# COVERHUNTER_CHECKPOINT_DIR = "./models/checkpoints/CoverHunter/pretrain_model/pt_model"
-COVERHUNTER_CONFIG_PATH = "./csi_models/checkpoints/CoverHunter/our_model/config/hparams.yaml"
-COVERHUNTER_CHECKPOINT_DIR = "./csi_models/checkpoints/CoverHunter/our_model/pt_model"
+with open("configs/paths.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+COVERHUNTER_CONFIG_PATH = config["coverhunter_config_path"]
+COVERHUNTER_CHECKPOINT_DIR = config["coverhunter_checkpoint_dir"]
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load CoverHunter Model
