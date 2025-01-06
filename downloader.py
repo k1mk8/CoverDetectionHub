@@ -5,26 +5,23 @@ from yt_dlp import YoutubeDL
 from tqdm.notebook import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-csv_path = "./data/interim/shs100k.csv" 
-output_dir = "./data/shs100k" 
+csv_path = "./datasets/shs100k/shs100k.csv"
+output_dir = ""
 
 
 os.makedirs(output_dir, exist_ok=True)
 
-
 df = pd.read_csv(csv_path)
 
-
-focused_train_ids = np.load("./data/splits/train_ids.npy", allow_pickle=True)
-focused_val_ids = np.load("./data/splits/val_ids.npy", allow_pickle=True)
-focused_test_ids = np.load("./data/splits/test_ids.npy", allow_pickle=True)
+focused_train_ids = np.load("./datasets/shs100k/train_ids.npy", allow_pickle=True)
+focused_val_ids = np.load("./datasets/shs100k/val_ids.npy", allow_pickle=True)
+focused_test_ids = np.load("./datasets/shs100k/test_ids.npy", allow_pickle=True)
 
 
 required_ids = set(focused_train_ids) | set(focused_val_ids) | set(focused_test_ids)
 
 filtered_metadata = df[df["id"].isin(required_ids)]
 print(f"Total files available: {len(filtered_metadata)}")
-
 
 filtered_metadata = filtered_metadata.head(50)
 print(f"Downloading first {len(filtered_metadata)} files.")
@@ -35,12 +32,12 @@ ydl_opts = {
     "postprocessors": [
         {
             "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
+            "preferredcodec": "m4a",
             "preferredquality": "192",
         }
     ],
-    "quiet": True, 
-    "outtmpl": os.path.join(output_dir, "%(id)s.%(ext)s"), 
+    "quiet": True,
+    "outtmpl": os.path.join(output_dir, "%(id)s.%(ext)s"),
 }
 
 
@@ -61,7 +58,6 @@ def download_audio(row):
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
 
-  
         for file in os.listdir(output_dir):
             if file.startswith(video_id) and file.endswith(".mp3"):
                 new_name = f"{file_id}.mp3"
@@ -75,7 +71,6 @@ def download_audio(row):
         return f"Failed to download {video_id}: {e}"
 
 
-
 num_threads = 16
 results = []
 
@@ -85,7 +80,9 @@ with ThreadPoolExecutor(max_workers=num_threads) as executor:
         for _, row in filtered_metadata.iterrows()
     }
 
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Downloading Audio"):
+    for future in tqdm(
+        as_completed(futures), total=len(futures), desc="Downloading Audio"
+    ):
         try:
             results.append(future.result())
         except Exception as e:
