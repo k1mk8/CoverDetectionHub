@@ -7,9 +7,9 @@ from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
 # Example usage (the same examples you had)
 examples = [
-    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.998],
+    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.97],
     ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter", 0.8],
-    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover", 0.998],
+    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover", 0.97],
     ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter", 0.8],
 ]
 
@@ -19,7 +19,7 @@ app1 = gr.Interface(
         gr.Audio(type="filepath", label="Query Song"),
         gr.Audio(type="filepath", label="Potential Cover Song"),
         gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"], value="ByteCover", label="Choose CSI Model"),
-        gr.Slider(minimum=0.5, maximum=1.0, step=0.0001, value=0.99, label="Threshold")
+        gr.Slider(minimum=0.5, maximum=1.0, step=0.001, value=0.99, label="Threshold")
     ],
     outputs=[
         gr.Textbox(label="Result"),
@@ -35,7 +35,6 @@ app2 = gr.Interface(
     inputs=[
         gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"], value="ByteCover", label="Choose CSI Model"),
         gr.Dropdown(choices=["Covers80", "Covers80but10", "Injected Abracadabra"], value="Covers80", label="Choose Dataset"),
-        gr.Slider(minimum=0.5, maximum=1.0, step=0.0001, value=0.99, label="Threshold")
     ],
     outputs=[
         gr.Textbox(label="Summary Metrics")

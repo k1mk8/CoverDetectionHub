@@ -4,13 +4,15 @@
 import os
 import pandas as pd
 import gradio as gr
+from tqdm import tqdm
 import yaml
+
+
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
 from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
 from csi_models.lyricover_utils import compute_similarity_lyricover, load_lyricover_model
-from evaluation.metrics import calculate_mean_average_precision, calculate_mean_rank_of_first_correct_cover, calculate_precision_at_k
+from evaluation.metrics import compute_mean_metrics_for_rankings
 from feature_extraction.feature_extraction import compute_similarity
-from utils.logging_config import logger
 
 
 with open("configs/paths.yaml", "r") as f:
@@ -50,47 +52,74 @@ def gather_injected_abracadabra_files(dataset_path, ground_truth_file):
         is_injected = injection_dict.get(rel_path, False)
         files_with_ground_truth.append((path, is_injected))
 
+
     return files_with_ground_truth
 
 
-def compute_injected_abracadabra_results(files_with_ground_truth, reference_song, similarity_function, threshold, progress=gr.Progress()):
+
+def compute_rankings_per_song(files_and_labels, similarity_function, progress=gr.Progress()):
     """
-    Compare each file in 'files_with_ground_truth' to the reference song.
+    For each song in 'files_and_labels', create a separate ranking 
+    based on similarity to other songs.
+    
+    Returns a list of dictionaries:
+    [
+      {
+        "query_path": ...,
+        "query_label": ...,
+        "ranking": [
+          { "candidate_path": ..., "similarity": float, "ground_truth": bool },
+          ...
+        ]
+      },
+      ...
+    ]
     """
-    results = []
-    total_files = len(files_with_ground_truth)
-    progress(0, desc="Initializing comparisons")
+    rankings_per_query = []
+    total_comparisons = len(files_and_labels)
+    progress(0, desc="Initializing pairwise comparisons")
+    
+    for i, (query_path, query_label) in enumerate(tqdm(files_and_labels)):
+        # Build a list of comparisons to the reference song
+        comparisons = []
+        
 
-    for idx, (song_path, is_injected) in enumerate(files_with_ground_truth):
-        similarity = similarity_function(song_path, reference_song)
-
-        predicted_cover = (similarity >= threshold)
-
-        logger.info(f"Comparison {idx + 1}/{total_files}")
-        logger.info(f"  Song: {song_path}")
-        logger.info(f"  Similarity: {similarity:.4f}")
-        logger.info(f"  Predicted Cover: {'Yes' if predicted_cover else 'No'}")
-        logger.info(f"  Ground Truth Cover: {'Yes' if is_injected else 'No'}")
-
-        results.append({
-            "song": song_path,
-            "similarity": similarity,
-            "is_cover": predicted_cover,
-            "ground_truth": is_injected
+        sim = similarity_function(query_path, REFERENCE_SONG)
+        # print(query_path, query_label)
+        gt = query_label
+        comparisons.append({
+            "candidate_path": query_path,
+            "similarity": sim,
+            "ground_truth": gt
         })
-        progress((idx + 1) / total_files, desc="Evaluating files")
 
-    # Sort descending by similarity
-    results.sort(key=lambda x: x["similarity"], reverse=True)
-    return results
+        # Sort descending by similarity
+        comparisons.sort(key=lambda x: x["similarity"], reverse=True)
 
-def evaluate_on_injected_abracadabra(model_name, threshold=0.99, progress=gr.Progress()):
+        # Save the ranking for query_path
+        rankings_per_query.append({
+            "query_path": query_path,
+            "query_label": query_label,
+            "ranking": comparisons
+        })
+        progress((i + 1) / total_comparisons, desc="Evaluating pairs")
 
+    return rankings_per_query
+
+
+def evaluate_on_injected_abracadabra(
+    model_name,
+    k=10
+):
+    """
+    Loads the dataset, computes rankings per song,
+    and calculates mAP, mP@k, mMR1.
+    """
     dataset_path = INJECTED_ABRACADABRA_DATA_DIR
     ground_truth_file = GROUND_TRUTH_FILE
     reference_song = REFERENCE_SONG
 
-    # Load model or define similarity function
+    # 2. Prepare similarity_function depending on the model
     if model_name == "ByteCover":
         model = load_bytecover_model()
         def similarity_function(a, b):
@@ -108,31 +137,20 @@ def evaluate_on_injected_abracadabra(model_name, threshold=0.99, progress=gr.Pro
             return compute_similarity(a, b, model_name)
         model = None
     else:
-        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid.")
+        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC or Spectral Centroid.")
 
-    # Gather and compute
-    files_with_ground_truth = gather_injected_abracadabra_files(dataset_path, ground_truth_file)
-    results = compute_injected_abracadabra_results(
-        files_with_ground_truth, reference_song, similarity_function, threshold, progress
-    )
+    # 3. Load the list of (file, label)
+    files_and_labels = gather_injected_abracadabra_files(dataset_path, ground_truth_file)
 
-    # Calculate metrics
-    p_at_10 = calculate_precision_at_k(results, k=10)
-    mr1 = calculate_mean_rank_of_first_correct_cover(results)
-    mAP = calculate_mean_average_precision(results)
+    # 4. Ranking for each song
+    rankings_per_query = compute_rankings_per_song(files_and_labels, similarity_function)
 
-    # Additional stats
-    total_relevant = sum(1 for r in results if r["ground_truth"])
-    predicted_correct_count = sum(1 for r in results if r["is_cover"] and r["ground_truth"])
-
-    summary_metrics = {
-        "Mean Average Precision (mAP)": mAP,
-        "Precision at 10 (P@10)": p_at_10,
-        "Mean Rank of First Correct Cover (MR1)": mr1,
-        "Total Covers Predicted Correctly": predicted_correct_count,
-        "Total Files (Ground Truth Covers)": total_relevant,
-        "Threshold Used": threshold
+    # 5. Compute aggregate metrics
+    metrics = compute_mean_metrics_for_rankings(rankings_per_query, k=k)
+    
+    # 6. Return results
+    return {
+        "Mean Average Precision (mAP)": metrics["mAP"],
+        f"Precision at {k} (mP@{k})": metrics["mP@k"],
+        "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
     }
-
-    return summary_metrics
-

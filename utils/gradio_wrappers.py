@@ -46,23 +46,22 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
     result = "Cover" if similarity >= threshold else "Not a Cover"
     return result, f"Similarity Score: {similarity}"
 
-def gradio_test_interface(model_name, dataset, threshold):
+def gradio_test_interface(model_name, dataset):
     """
     Gradio interface function for testing a model on a given dataset (Covers80, etc.).
     """
     if dataset == "Covers80":
-        results = evaluate_on_covers80(model_name, threshold)
+        results = evaluate_on_covers80(model_name)
     elif dataset == "Covers80but10":
-        results = evaluate_on_covers80(model_name, threshold, covers80but10=True)
+        results = evaluate_on_covers80(model_name, covers80but10=True)
     elif dataset == "Injected Abracadabra":
-        results = evaluate_on_injected_abracadabra(model_name, threshold)
+        results = evaluate_on_injected_abracadabra(model_name)
     else:
         return "Invalid dataset selected."
 
     summary_table = (
         f"Mean Average Precision (mAP): {results.get('Mean Average Precision (mAP)', 'N/A')}\n"
-        f"Precision at 10 (P@10): {results.get('Precision at 10 (P@10)', 'N/A')}\n"
-        f"Mean Rank of First Correct Cover (MR1): {results.get('Mean Rank of First Correct Cover (MR1)', 'N/A')}\n"
-        f"Threshold Used: {threshold}"
+        f"Precision at 10 (P@10): {results.get('Precision at 10 (mP@10)', 'N/A')}\n"
+        f"Mean Rank of First Correct Cover (MR1): {results.get('Mean Rank of First Correct Cover (mMR1)', 'N/A')}\n"
     )
     return summary_table
