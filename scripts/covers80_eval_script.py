@@ -2,6 +2,7 @@ import os
 import sys
 import gradio as gr
 import yaml
+import argparse
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -249,6 +250,22 @@ def evaluate_on_covers80(
 
 
 if __name__ == "__main__":
-    result = evaluate_on_covers80("ByteCover", covers80but10=True)
-    print(result)
+    parser = argparse.ArgumentParser(description="Evaluate cover song detection models on the covers80 dataset.")
+    
+    # Add argument for model selection
+    parser.add_argument(
+        "--model",
+        type=str,
+        required=True,
+        choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"],
+        help="The name of the model to evaluate (ByteCover, CoverHunter, Lyricover, MFCC, Spectral Centroid)."
+    )
 
+    args = parser.parse_args()
+
+    result = evaluate_on_covers80(
+        model_name=args.model
+    )
+    print("Evaluation Results:")
+    for key, value in result.items():
+        print(f"{key}: {value}")

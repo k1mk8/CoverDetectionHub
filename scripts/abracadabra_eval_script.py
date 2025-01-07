@@ -1,6 +1,7 @@
 
 
 
+import argparse
 import os
 import sys
 import pandas as pd
@@ -160,6 +161,24 @@ def evaluate_on_injected_abracadabra(
     }
 
 
+
 if __name__ == "__main__":
-    results = evaluate_on_injected_abracadabra("ByteCover")
-    print(results)
+    parser = argparse.ArgumentParser(description="Evaluate cover song detection models on the covers80 dataset.")
+    
+    # Add argument for model selection
+    parser.add_argument(
+        "--model",
+        type=str,
+        required=True,
+        choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"],
+        help="The name of the model to evaluate (ByteCover, CoverHunter, Lyricover, MFCC, Spectral Centroid)."
+    )
+
+    args = parser.parse_args()
+
+    result = evaluate_on_injected_abracadabra(
+        model_name=args.model
+    )
+    print("Evaluation Results:")
+    for key, value in result.items():
+        print(f"{key}: {value}")
