@@ -1,4 +1,4 @@
-bytecover_checkpoint_path: "csi_models/checkpoints/bytecover/bytecover_run4.pt"
+bytecover_checkpoint_path: "csi_models/checkpoints/bytecover/orfium-bytecover.pt"
 
 coverhunter_config_path: "csi_models/checkpoints/CoverHunter/our_model/config/hparams.yaml"
 coverhunter_checkpoint_dir: "csi_models/checkpoints/CoverHunter/our_model/pt_model"

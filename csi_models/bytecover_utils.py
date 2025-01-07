@@ -2,9 +2,6 @@ import torch
 
 from csi_models.bytecover.bytecover.models.modules import Bottleneck, Resnet50
 from feature_extraction.audio_preprocessing import preprocess_audio
-
-# Configuration
-# BYTECOVER_CHECKPOINT_PATH = "models/checkpoints/bytecover/orfium-bytecover.pt"
 import yaml
 
 with open("configs/paths.yaml", "r") as f:
@@ -18,12 +15,13 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load ByteCover model
 def load_bytecover_model(checkpoint_path=BYTECOVER_CHECKPOINT_PATH):
+    loaded_weights = torch.load(checkpoint_path, map_location=DEVICE)
     model = Resnet50(
         Bottleneck, num_channels=1, num_classes=10000, compress_ratio=20, tempo_factors=[0.7, 1.3]
-    )
+        )
     model.to(DEVICE)
-    checkpoint = torch.load(checkpoint_path, map_location=DEVICE, weights_only=True)
-    model.load_state_dict(checkpoint, strict=False)
+    
+    model.load_state_dict(loaded_weights)
     model.eval()
     return model
 
@@ -37,8 +35,8 @@ def compute_similarity_bytecover(song1_path, song2_path, model):
         features2 = model(song2)
 
     # Extract and normalize embeddings
-    embedding1 = torch.nn.functional.normalize(features1["f_t"], p=2, dim=1)
-    embedding2 = torch.nn.functional.normalize(features2["f_t"], p=2, dim=1)
+    embedding1 = torch.nn.functional.normalize(features1["f_c"], p=2, dim=1)
+    embedding2 = torch.nn.functional.normalize(features2["f_c"], p=2, dim=1)
 
     # Compute cosine similarity
     similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
