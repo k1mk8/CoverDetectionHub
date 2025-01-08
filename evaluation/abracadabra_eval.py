@@ -1,20 +1,17 @@
-
-
-
 import os
 import pandas as pd
 import gradio as gr
 from tqdm import tqdm
 import yaml
-
-
-from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
-from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
-from csi_models.lyricover_utils import compute_similarity_lyricover, load_lyricover_model
+import logging
+from csi_models.ModelBase import ModelBase
+from csi_models.ByteCoverModel import ByteCoverModel
+from csi_models.CoverHunterModel import CoverHunterModel
+from csi_models.LyricoverModel import LyricoverModel
+from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
 from evaluation.metrics import compute_mean_metrics_for_rankings
-from feature_extraction.feature_extraction import compute_similarity
 
-
+# Load configuration
 with open("configs/paths.yaml", "r") as f:
     config = yaml.safe_load(f)
 
@@ -45,111 +42,99 @@ def gather_injected_abracadabra_files(dataset_path, ground_truth_file):
     # Build a list of (path, ground_truth_is_injected)
     files_with_ground_truth = []
     for path in all_audio_files:
-        
         rel_path = os.path.relpath(path, start=INJECTED_ABRACADABRA_DIR).replace("\\", "/")
-
-        # Look up in injection_dict
         is_injected = injection_dict.get(rel_path, False)
         files_with_ground_truth.append((path, is_injected))
 
-
     return files_with_ground_truth
 
-
-
-def compute_rankings_per_song(files_and_labels, similarity_function, progress=gr.Progress()):
+def compute_ranking_for_reference_song(files_and_labels, model, reference_path=REFERENCE_SONG):
     """
-    For each song in 'files_and_labels', create a separate ranking 
-    based on similarity to other songs.
-    
-    Returns a list of dictionaries:
-    [
-      {
-        "query_path": ...,
-        "query_label": ...,
-        "ranking": [
-          { "candidate_path": ..., "similarity": float, "ground_truth": bool },
-          ...
-        ]
-      },
-      ...
-    ]
+    Compute a ranking of ALL candidate songs by their similarity
+    to the ONE given reference.
     """
-    rankings_per_query = []
-    total_comparisons = len(files_and_labels)
-    progress(0, desc="Initializing pairwise comparisons")
+    # 1) Compute reference embedding
+    ref_embedding = model.compute_embedding(reference_path)
     
-    for i, (query_path, query_label) in enumerate(tqdm(files_and_labels)):
-        # Build a list of comparisons to the reference song
-        comparisons = []
-        
-
-        sim = similarity_function(query_path, REFERENCE_SONG)
-        # print(query_path, query_label)
-        gt = query_label
-        comparisons.append({
-            "candidate_path": query_path,
+    # 2) Compute embeddings for all candidate songs
+    embeddings = compute_embeddings(files_and_labels, model)
+    
+    # 3) Build a list of {candidate_path, similarity, ground_truth} for each candidate
+    ranking = []
+    for candidate_path, candidate_label in files_and_labels:
+        cand_embedding = embeddings[candidate_path]
+        sim = model.compute_similarity(ref_embedding, cand_embedding)
+        ranking.append({
+            "candidate_path": candidate_path,
             "similarity": sim,
-            "ground_truth": gt
+            "ground_truth": candidate_label
         })
+    
+    # 4) Sort by similarity descending
+    ranking.sort(key=lambda x: x["similarity"], reverse=True)
+    
 
-        # Sort descending by similarity
-        comparisons.sort(key=lambda x: x["similarity"], reverse=True)
-
-        # Save the ranking for query_path
-        rankings_per_query.append({
-            "query_path": query_path,
-            "query_label": query_label,
-            "ranking": comparisons
-        })
-        progress((i + 1) / total_comparisons, desc="Evaluating pairs")
-
-    return rankings_per_query
+    single_ranking = [
+        {
+            "query_path": reference_path,
+            "query_label": "reference_label",  # or some label you want
+            "ranking": ranking  # e.g. list of dicts: {candidate_path, similarity, ground_truth}
+        }
+    ]
+    return single_ranking
 
 
-def evaluate_on_injected_abracadabra(
-    model_name,
-    k=10
-):
+
+
+def compute_embeddings(files_and_labels, model: ModelBase, progress=gr.Progress()):
+    """
+    Compute and cache embeddings for all audio files using the given model.
+    """
+    progress(0, desc="Calculating embeddings")
+    embeddings = {}
+    total_files = len(files_and_labels)
+
+    for i, (audio_path, _) in enumerate(tqdm(files_and_labels, desc="Computing embeddings")):
+        if audio_path not in embeddings:
+            embeddings[audio_path] = model.compute_embedding(audio_path)
+        progress((i + 1) / total_files, desc="Calculating embeddings")
+
+    return embeddings
+
+
+def evaluate_on_injected_abracadabra(model_name, k=10):
     """
     Loads the dataset, computes rankings per song,
     and calculates mAP, mP@k, mMR1.
     """
     dataset_path = INJECTED_ABRACADABRA_DATA_DIR
     ground_truth_file = GROUND_TRUTH_FILE
-    reference_song = REFERENCE_SONG
 
-    # 2. Prepare similarity_function depending on the model
-    if model_name == "ByteCover":
-        model = load_bytecover_model()
-        def similarity_function(a, b):
-            return compute_similarity_bytecover(a, b, model)
-    elif model_name == "CoverHunter":
-        model = load_coverhunter_model()
-        def similarity_function(a, b):
-            return compute_similarity_coverhunter(a, b, model)
-    elif model_name == "Lyricover":
-        model = load_lyricover_model()
-        def similarity_function(a, b):
-            return compute_similarity_lyricover(a, b, model)
-    elif model_name in ["MFCC", "Spectral Centroid"]:
-        def similarity_function(a, b):
-            return compute_similarity(a, b, model_name)
-        model = None
-    else:
-        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC or Spectral Centroid.")
+    # Select the appropriate model
+    model_mapping = {
+        "ByteCover": ByteCoverModel,
+        "CoverHunter": CoverHunterModel,
+        "Lyricover": LyricoverModel,
+        "MFCC": MFCCModel,
+        "Spectral Centroid": SpectralCentroidModel
+    }
 
-    # 3. Load the list of (file, label)
+    if model_name not in model_mapping:
+        raise ValueError(f"Unsupported model. Choose one of: {list(model_mapping.keys())}")
+
+    model = model_mapping[model_name]()
+
+    # Load the list of (file, label)
     files_and_labels = gather_injected_abracadabra_files(dataset_path, ground_truth_file)
 
-    # 4. Ranking for each song
-    rankings_per_query = compute_rankings_per_song(files_and_labels, similarity_function)
+    # Compute rankings for each song
+    ranking = compute_ranking_for_reference_song(files_and_labels, model)
 
-    # 5. Compute aggregate metrics
-    metrics = compute_mean_metrics_for_rankings(rankings_per_query, k=k)
-    
-    # 6. Return results
+    # Compute aggregate metrics
+    metrics = compute_mean_metrics_for_rankings(ranking, k=k)
+
     return {
+        "Model": model_name,
         "Mean Average Precision (mAP)": metrics["mAP"],
         f"Precision at {k} (mP@{k})": metrics["mP@k"],
         "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
