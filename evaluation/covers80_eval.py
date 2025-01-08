@@ -1,25 +1,28 @@
 import os
 import gradio as gr
+import torch
 import yaml
-
-from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
-from csi_models.coverhunter_utils import compute_similarity_coverhunter, load_coverhunter_model
-from csi_models.lyricover_utils import compute_similarity_lyricover, load_lyricover_model
-from feature_extraction.feature_extraction import compute_similarity
-from evaluation.metrics import compute_mean_metrics_for_rankings
 from tqdm import tqdm
-from utils.logging_config import logger
+from csi_models.ModelBase import ModelBase
+from csi_models.ByteCoverModel import ByteCoverModel
+from csi_models.CoverHunterModel import CoverHunterModel
+from csi_models.LyricoverModel import LyricoverModel
+from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
+from evaluation.metrics import compute_mean_metrics_for_rankings
 
+# Load configurations
 with open("configs/paths.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 COVERS80_DATA_DIR = config["covers80_data_dir"]
 COVERS80BUT10_DATA_DIR = config["covers80but10_data_dir"]
 
-def gather_covers80_dataset_files(dataset_path):
-    """
-    Return a list of (audio_file_path, label) for all folders in covers80 or covers80but10.
-    """
+
+def gather_covers80_dataset_files(dataset_path: str):
+    """Return a list of (audio_file_path, label) for all folders in the dataset."""
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError(f"Dataset path does not exist: {dataset_path}")
+
     all_audio_files = []
     song_labels = []
 
@@ -28,12 +31,9 @@ def gather_covers80_dataset_files(dataset_path):
         if not os.path.isdir(folder_path):
             continue
 
-        audio_files = [
-            os.path.join(folder_path, f)
-            for f in os.listdir(folder_path) if f.endswith(".mp3")
-        ]
+        audio_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".mp3")]
         if len(audio_files) < 2:
-            logger.warning(f"Skipping folder {folder} with less than 2 files.")
+            # Skipping folder folder with less than 2 files
             continue
 
         all_audio_files.extend(audio_files)
@@ -42,103 +42,74 @@ def gather_covers80_dataset_files(dataset_path):
     return list(zip(all_audio_files, song_labels))
 
 
-def compute_rankings_per_song(files_and_labels, similarity_function, progress=gr.Progress()):
-    """
-    For each song in 'files_and_labels', create a separate ranking 
-    based on similarity to other songs.
-    
-    Returns a list of dictionaries:
-    [
-      {
-        "query_path": ...,
-        "query_label": ...,
-        "ranking": [
-          { "candidate_path": ..., "similarity": float, "ground_truth": bool },
-          ...
-        ]
-      },
-      ...
-    ]
-    """
+def compute_embeddings(files_and_labels, model: ModelBase, progress=gr.Progress()):
+    """Compute and cache embeddings for all audio files using the given model."""
+    progress(0, desc="Calculating embeddings")
+    embeddings = {}
+    total_files = len(files_and_labels)
+
+    for i, (audio_path, _) in enumerate(tqdm(files_and_labels, desc="Computing embeddings")):
+        if audio_path not in embeddings:
+            embeddings[audio_path] = model.compute_embedding(audio_path)
+        progress((i + 1) / total_files, desc="Calculating embeddings")
+
+    return embeddings
+
+
+def compute_rankings_per_song(files_and_labels, model: ModelBase, progress=gr.Progress()):
+    """Compute rankings for each song in the dataset."""
+    embeddings = compute_embeddings(files_and_labels, model)
     rankings_per_query = []
-    total_comparisons = len(files_and_labels)
-    progress(0, desc="Initializing pairwise comparisons")
-    
-    for i, (query_path, query_label) in enumerate(tqdm(files_and_labels)):
-        # Build a list of comparisons to all other songs
+    total_files = len(files_and_labels)
+    progress(0, desc="Comparing embeddings")
+
+    for i, (query_path, query_label) in enumerate(tqdm(files_and_labels, desc="Processing queries")):
+        query_embedding = embeddings[query_path]
+
         comparisons = []
         for j, (cand_path, cand_label) in enumerate(files_and_labels):
             if i == j:
-                continue  # Skip the same song
+                continue
 
-            sim = similarity_function(query_path, cand_path)
-            gt = (query_label == cand_label)  # True if it is indeed a cover
-            comparisons.append({
-                "candidate_path": cand_path,
-                "similarity": sim,
-                "ground_truth": gt
-            })
+            cand_embedding = embeddings[cand_path]
+            sim = model.compute_similarity(query_embedding, cand_embedding)
+            gt = (query_label == cand_label)
 
-        # Sort descending by similarity
+            comparisons.append({"candidate_path": cand_path, "similarity": sim, "ground_truth": gt})
+
         comparisons.sort(key=lambda x: x["similarity"], reverse=True)
 
-        # Save the ranking for query_path
         rankings_per_query.append({
             "query_path": query_path,
             "query_label": query_label,
             "ranking": comparisons
         })
-        progress((i + 1) / total_comparisons, desc="Evaluating pairs")
+        progress((i + 1) / total_files, desc="Comparing embedding pairs")
 
     return rankings_per_query
 
 
-def evaluate_on_covers80(
-    model_name,
-    covers80but10=False,
-    k=10
-):
-    """
-    Loads the covers80 (or covers80but10) dataset, computes rankings per song,
-    and calculates mAP, mP@k, mMR1.
-    """
-
-    # 1. Select dataset path
-    if covers80but10:
-        dataset_path = COVERS80BUT10_DATA_DIR
-    else:
-        dataset_path = COVERS80_DATA_DIR
-
-    # 2. Prepare similarity_function depending on the model
-    if model_name == "ByteCover":
-        model = load_bytecover_model()
-        def similarity_function(a, b):
-            return compute_similarity_bytecover(a, b, model)
-    elif model_name == "CoverHunter":
-        model = load_coverhunter_model()
-        def similarity_function(a, b):
-            return compute_similarity_coverhunter(a, b, model)
-    elif model_name == "Lyricover":
-        model = load_lyricover_model()
-        def similarity_function(a, b):
-            return compute_similarity_lyricover(a, b, model)
-    elif model_name in ["MFCC", "Spectral Centroid"]:
-        def similarity_function(a, b):
-            return compute_similarity(a, b, model_name)
-        model = None
-    else:
-        raise ValueError("Unsupported model. Choose ByteCover, CoverHunter, Lyricover, MFCC or Spectral Centroid.")
-
-    # 3. Load the list of (file, label)
+def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
+    """Evaluate a model on the covers80 dataset."""
+    dataset_path = COVERS80BUT10_DATA_DIR if covers80but10 else COVERS80_DATA_DIR
     files_and_labels = gather_covers80_dataset_files(dataset_path)
 
-    # 4. Ranking for each song
-    rankings_per_query = compute_rankings_per_song(files_and_labels, similarity_function)
+    model_mapping = {
+        "ByteCover": ByteCoverModel,
+        "CoverHunter": CoverHunterModel,
+        "Lyricover": LyricoverModel,
+        "MFCC": MFCCModel,
+        "Spectral Centroid": SpectralCentroidModel
+    }
 
-    # 5. Compute aggregate metrics
+    if model_name not in model_mapping:
+        raise ValueError(f"Unsupported model. Choose one of: {list(model_mapping.keys())}")
+
+    model = model_mapping[model_name]()
+
+    rankings_per_query = compute_rankings_per_song(files_and_labels, model)
     metrics = compute_mean_metrics_for_rankings(rankings_per_query, k=k)
-    
-    # 6. Return results
+
     return {
         "Model": model_name,
         "Dataset": "covers80but10" if covers80but10 else "covers80",

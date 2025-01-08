@@ -1,19 +1,11 @@
 from feature_extraction.audio_preprocessing import validate_audio, InvalidMediaFileError
-from feature_extraction.feature_extraction import compute_similarity
-from csi_models.bytecover_utils import load_bytecover_model, compute_similarity_bytecover
-from csi_models.coverhunter_utils import load_coverhunter_model, compute_similarity_coverhunter
-from csi_models.lyricover_utils import (
-    load_lyricover_model,
-    compute_similarity_lyricover
-)
-
 from evaluation.covers80_eval import evaluate_on_covers80
 from evaluation.abracadabra_eval import evaluate_on_injected_abracadabra
+from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
+from csi_models.ByteCoverModel import ByteCoverModel
+from csi_models.CoverHunterModel import CoverHunterModel
+from csi_models.LyricoverModel import LyricoverModel
 
-
-bytecover_model = load_bytecover_model()
-coverhunter_model = load_coverhunter_model()
-lyricover_model = load_lyricover_model(instrumental_threshold=8)
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
     """
@@ -31,16 +23,24 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
     except InvalidMediaFileError as e:
         return str(e), ""
 
-    # Compute similarity using whichever model is selected
-    if model_name == "ByteCover":
-        similarity = compute_similarity_bytecover(audio1, audio2, bytecover_model)
-    elif model_name == "CoverHunter":
-        similarity = compute_similarity_coverhunter(audio1, audio2, coverhunter_model)
-    elif model_name == "Lyricover":
-        similarity = compute_similarity_lyricover(audio1, audio2, lyricover_model)
-    else:
-        # For MFCC or Spectral Centroid
-        similarity = compute_similarity(audio1, audio2, model_name)
+    # Load the appropriate model
+    model_mapping = {
+        "ByteCover": ByteCoverModel,
+        "CoverHunter": CoverHunterModel,
+        "Lyricover": LyricoverModel,
+        "MFCC": MFCCModel,
+        "Spectral Centroid": SpectralCentroidModel
+    }
+
+    if model_name not in model_mapping:
+        return "Invalid model selected.", ""
+
+    model = model_mapping[model_name]()
+
+    # Compute similarity using the selected model
+    embedding1 = model.compute_embedding(audio1)
+    embedding2 = model.compute_embedding(audio2)
+    similarity = model.compute_similarity(embedding1, embedding2)
 
     # Determine cover or not based on similarity & threshold
     result = "Cover" if similarity >= threshold else "Not a Cover"
