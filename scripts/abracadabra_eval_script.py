@@ -1,11 +1,16 @@
 
 
 
+import argparse
 import os
+import sys
 import pandas as pd
 import gradio as gr
 from tqdm import tqdm
 import yaml
+
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 from csi_models.bytecover_utils import compute_similarity_bytecover, load_bytecover_model
@@ -154,3 +159,26 @@ def evaluate_on_injected_abracadabra(
         f"Precision at {k} (mP@{k})": metrics["mP@k"],
         "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
     }
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Evaluate cover song detection models on the covers80 dataset.")
+    
+    # Add argument for model selection
+    parser.add_argument(
+        "--model",
+        type=str,
+        required=True,
+        choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"],
+        help="The name of the model to evaluate (ByteCover, CoverHunter, Lyricover, MFCC, Spectral Centroid)."
+    )
+
+    args = parser.parse_args()
+
+    result = evaluate_on_injected_abracadabra(
+        model_name=args.model
+    )
+    print("Evaluation Results:")
+    for key, value in result.items():
+        print(f"{key}: {value}")
