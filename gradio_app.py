@@ -7,10 +7,12 @@ from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
 # Example usage (the same examples you had)
 examples = [
-    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "ByteCover", 0.97],
-    ["datasets/example_audio/cicha_noc1.mp3", "datasets/example_audio/cicha_noc2.mp3", "CoverHunter", 0.8],
-    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something2.mp3", "ByteCover", 0.97],
-    ["datasets/example_audio/something1.mp3", "datasets/example_audio/something3.mp3", "CoverHunter", 0.8],
+    ["datasets\example_audio\Silent-Night-Elvis.mp3", "datasets\example_audio\Silent-Night.mp3", "ByteCover", 0.97],
+    ["datasets\example_audio\Silent-Night-Elvis.mp3", "datasets\example_audio\Silent-Night.mp3", "CoverHunter", 0.8],
+    ["datasets\example_audio\Steve_Miller Band-Abracadabra.mp3", "datasets\example_audio\Sugar Ray-Abracadabra.mp3", "Lyricover", 0.6],
+    ["datasets\example_audio\Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "datasets\example_audio\Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.6],
+    ["datasets\example_audio\Steve_Miller Band-Abracadabra.mp3", "datasets\example_audio\Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "CoverHunter", 0.8],
+    ["datasets\example_audio\Sugar Ray-Abracadabra.mp3", "datasets\example_audio\Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.8],
 ]
 
 app1 = gr.Interface(
