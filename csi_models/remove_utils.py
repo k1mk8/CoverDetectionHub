@@ -8,14 +8,16 @@ from torch.utils.data import DataLoader
 
 import essentia.standard as estd
 
-from remove.datasets.full_size_instance_dataset import FullSizeInstanceDataset
-from remove.models.move_model import MOVEModel
+from csi_models.remove.datasets.full_size_instance_dataset import (
+    FullSizeInstanceDataset,
+)
+from csi_models.remove.models.move_model import MOVEModel
 
-from remove.utils.metrics import pairwise_cosine_similarity
-from remove.utils.metrics import pairwise_euclidean_distance
-from remove.utils.metrics import pairwise_pearson_coef
-from remove.utils.data_utils import import_dataset_from_pt
-from remove.utils.data_utils import handle_device
+from csi_models.remove.utils.metrics import pairwise_cosine_similarity
+from csi_models.remove.utils.metrics import pairwise_euclidean_distance
+from csi_models.remove.utils.metrics import pairwise_pearson_coef
+from csi_models.remove.utils.data_utils import import_dataset_from_pt
+from csi_models.remove.utils.data_utils import handle_device
 
 from feature_extraction.audio_preprocessing import preprocess_audio
 
