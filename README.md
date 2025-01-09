@@ -55,6 +55,8 @@ A framework and “hub” for **music cover identification**, enabling researche
 5. Prepare Datasets:
   - Datasets are available to download here.
   - Update or create `configs/paths.yaml` to point to provide paths for datasets.
+
+The config has been tested on Linux and Windows machines with CUDA. Please note you may need to install software from **Technology stack** section "Needed to run".
    
 ## Project Overview
 
@@ -76,6 +78,10 @@ Main technologies in use:
 - **Librosa**: Used for audio loading and some feature extraction (MFCC, spectral centroid) in the simpler comparison methods.
 - **venv** (or other tool): For making the project portable in an easy way
 - **OpenAI Whisper**: Used by Lyricover to transcribe lyrics and measure similarity in lyric space.
+
+Other programs that are needed to run:
+- [**ffmpeg**](https://github.com/FFmpeg/FFmpeg): Used for samples validation and simple preprocessing
+- [**SoX**](https://github.com/chirlu/sox): Used for audio processing
 
 ## Models Implemented 
 We currently have 3 main cover-detection models:
