@@ -8,7 +8,7 @@
 	branch = main
 [submodule "csi_models/remove"]
 	path = csi_models/remove
-	url = https://github.com/cncPomper/remove
+	url = https://github.com/cncPomper/remove.git
 	branch = master
 [submodule "csi_models/lyricover"]
 	path = csi_models/lyricover
