@@ -19,7 +19,8 @@ A framework and “hub” for **music cover identification**, enabling researche
 6. [Available Datasets](#available-datasets)
 7. [Gradio App Usage](#gradio-app-usage)
 8. [Experiments and Tests](#experiments-and-tests)
-9. [Bibliography Review](#bibliography-review)
+9. [Future Challenges](#future-challenges)
+10. [Bibliography Review](#bibliography-review)
 
 
 ---
@@ -222,3 +223,9 @@ A browser tab should open with two tabs:
 ### W14 (13-19.01.2025)
 
 :tada: Public project presentation :tada:
+
+## Future challenges
+- obtaining Da-Tacos dataset and possibly perform training and evaluation on it
+- improving the [LyriCover](https://github.com/DawidRucinski/LyriCover) model for more sophisticated audio features exctraction; training on a larger subset of SHS100k after improving performance of the model
+- possible co-operation with [ZAIKS](https://zaiks.org.pl/) to form a new dataset and deploy the solution
+- performing more experiments, similar to "Injected Abracadabra" or others found in the literature
