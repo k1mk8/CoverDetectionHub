@@ -1,8 +1,21 @@
 import os
 import numpy as np
 
-import essentia.standard as estd
+import time
+
 import torch
+from torch.utils.data import DataLoader
+
+import essentia.standard as estd
+
+from remove.datasets.full_size_instance_dataset import FullSizeInstanceDataset
+from remove.models.move_model import MOVEModel
+
+from remove.utils.metrics import pairwise_cosine_similarity
+from remove.utils.metrics import pairwise_euclidean_distance
+from remove.utils.metrics import pairwise_pearson_coef
+from remove.utils.data_utils import import_dataset_from_pt
+from remove.utils.data_utils import handle_device
 
 from feature_extraction.audio_preprocessing import preprocess_audio
 
@@ -103,6 +116,72 @@ def create_benchmark_ytrue(labels, output_dir, ytrue_labels):
     torch.save(torch.Tensor(ytrue), os.path.join(output_dir, ytrue_labels))
 
 
+def evaluate(benchmark_path, ytrue_path, loss, model_name, emb_size=256):
+
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+    model = MOVEModel(emb_size=emb_size)
+
+    model.load_state_dict(torch.load(model_name, map_location="cpu"))
+
+    model.to(device)
+
+    test_data, test_labels = import_dataset_from_pt(
+        filename=benchmark_path, suffix=False
+    )
+    test_set = FullSizeInstanceDataset(data=test_data)
+    test_loader = DataLoader(test_set, batch_size=1, shuffle=False)
+
+    start_time = time.monotonic()
+
+    with torch.no_grad():  # disabling gradient tracking
+        model.eval()  # setting the model to evaluation mode
+
+        # initializing an empty tensor for storing the embeddings
+        embed_all = torch.tensor([], device=device)
+
+        # iterating through the data loader
+        for batch_idx, item in enumerate(test_loader):
+            # sending the items to the proper device
+            item = handle_device(item, device)
+            # print(item.shape)
+            # forward pass of the model
+            # obtaining the embeddings of each item in the batch
+            emb = model(item)
+
+            # appending the current embedding to the collection of embeddings
+            embed_all = torch.cat((embed_all, emb))
+
+        if len(test_loader) == 2:
+            test_list = []
+            for batch_idx, item in enumerate(test_loader):
+                item = handle_device(item, device)
+                test_list.append(item)
+
+                # 3item1 = handle_device(test_set[1], device)
+            embedding0 = model(test_list[0])
+            embedding1 = model(test_list[1])
+            similarity = torch.nn.functional.cosine_similarity(embedding0, embedding1)
+            print("cosine_similarity= ", np.round(similarity.item(), 3))
+        # if Triplet or ProxyNCA loss is used, the distance function is Euclidean distance
+        if loss in [0, 1]:
+            dist_all = pairwise_euclidean_distance(embed_all)
+            dist_all /= model.fin_emb_size
+        # if NormalizedSoftmax loss is used, the distance function is cosine distance
+        elif loss == 2:
+            dist_all = -1 * pairwise_cosine_similarity(embed_all)
+        # if Group loss is used, the distance function is Pearson correlation coefficient
+        else:
+            dist_all = -1 * pairwise_pearson_coef(embed_all)
+
+    # print(embed_all[0])
+    test_time = time.monotonic() - start_time
+    # euc = pairwise_euclidean_distance(embed_all)
+    print("pairwise_cosine_similarity=", dist_all)
+
+    print("Total time: {:.0f}m{:.0f}s.".format(test_time // 60, test_time % 60))
+
+
 # Compute Similarity with Re-move
 def compute_similarity_remove(audio1_path, audio2_path, model):
     """
@@ -133,11 +212,17 @@ def compute_similarity_remove(audio1_path, audio2_path, model):
 eval_df = "temp_v0.pt"
 output_dir = "temp_dir"
 
+# item_list = [
+#     "datasets/example_audio/3ahbE6bcVf8.m4a",
+#     "datasets/example_audio/642Qxap_c78.m4a",
+#     "datasets/example_audio/bMoY5rNBjwk.m4a",
+#     "datasets/example_audio/L3xPVGosADQ.m4a",
+# ]
+
+# The same
 item_list = [
-    "../cover500/500/3ahbE6bcVf8.m4a",
-    "../cover500/109/642Qxap_c78.m4a",
-    "../cover500/123/bMoY5rNBjwk.m4a",
-    "../cover500/123/L3xPVGosADQ.m4a",
+    "datasets/example_audio/bMoY5rNBjwk.m4a",
+    "datasets/example_audio/L3xPVGosADQ.m4a",
 ]
 
 for item in item_list:
@@ -145,3 +230,10 @@ for item in item_list:
 
 ytrue = torch.load(os.path.join(output_dir, eval_df))["labels"]
 create_benchmark_ytrue(ytrue, output_dir, "ytrue_v0.pt")
+
+evaluate(
+    benchmark_path="temp_dir/temp_v0.pt",
+    ytrue_path="temp_dir/ytrue_v0.pt",
+    loss=2,
+    model_name="saved_models/lsr_models/model_re-move_lsr_noe_10.pt",
+)
