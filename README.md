@@ -29,9 +29,10 @@ A framework and “hub” for **music cover identification**, enabling researche
 
 1. **Clone or Download** this repository:
    ```bash
-   git clone https://github.com/cncPomper/CoverDetectionHub.git
+   git clone https://github.com/cncPomper/CoverDetectionHub.git --recurse-submodules
    cd CoverDetectionHub
    ```
+   Note: **--recurse-submodules** is very important, as our hub compares various models that are stored in submodules.
 
 2. Create and Activate a Virtual Environment (optional but recommended):
    ```bash
