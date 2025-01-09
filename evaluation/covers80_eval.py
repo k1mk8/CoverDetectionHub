@@ -2,6 +2,7 @@ import os
 import gradio as gr
 import torch
 import yaml
+import logging
 from tqdm import tqdm
 from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
@@ -20,7 +21,9 @@ COVERS80BUT10_DATA_DIR = config["covers80but10_data_dir"]
 
 def gather_covers80_dataset_files(dataset_path: str):
     """Return a list of (audio_file_path, label) for all folders in the dataset."""
+    logging.info(f"Gathering dataset files from {dataset_path}")
     if not os.path.exists(dataset_path):
+        logging.error(f"Dataset path does not exist: {dataset_path}")
         raise FileNotFoundError(f"Dataset path does not exist: {dataset_path}")
 
     all_audio_files = []
@@ -34,6 +37,7 @@ def gather_covers80_dataset_files(dataset_path: str):
         audio_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".mp3")]
         if len(audio_files) < 2:
             # Skipping folder folder with less than 2 files
+            logging.warning(f"Skipping folder '{folder}' with less than 2 files.")
             continue
 
         all_audio_files.extend(audio_files)
@@ -58,6 +62,7 @@ def compute_embeddings(files_and_labels, model: ModelBase, progress=gr.Progress(
 
 def compute_rankings_per_song(files_and_labels, model: ModelBase, progress=gr.Progress()):
     """Compute rankings for each song in the dataset."""
+    logging.info("Starting computation of rankings per song.")
     embeddings = compute_embeddings(files_and_labels, model)
     rankings_per_query = []
     total_files = len(files_and_labels)
@@ -65,7 +70,9 @@ def compute_rankings_per_song(files_and_labels, model: ModelBase, progress=gr.Pr
 
     for i, (query_path, query_label) in enumerate(tqdm(files_and_labels, desc="Processing queries")):
         query_embedding = embeddings[query_path]
-
+        if query_embedding is None:
+            logging.warning(f"No embedding found for query file {query_path}. Skipping.")
+            continue
         comparisons = []
         for j, (cand_path, cand_label) in enumerate(files_and_labels):
             if i == j:
@@ -92,6 +99,7 @@ def compute_rankings_per_song(files_and_labels, model: ModelBase, progress=gr.Pr
 def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
     """Evaluate a model on the covers80 dataset."""
     dataset_path = COVERS80BUT10_DATA_DIR if covers80but10 else COVERS80_DATA_DIR
+    logging.info(f"Evaluating model '{model_name}' on dataset '{dataset_path}' with k={k}.")
     files_and_labels = gather_covers80_dataset_files(dataset_path)
 
     model_mapping = {
@@ -103,6 +111,7 @@ def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
     }
 
     if model_name not in model_mapping:
+        logging.error(f"Unsupported model '{model_name}'.")
         raise ValueError(f"Unsupported model. Choose one of: {list(model_mapping.keys())}")
 
     model = model_mapping[model_name]()
