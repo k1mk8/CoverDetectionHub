@@ -6,9 +6,9 @@
 	path = csi_models/CoverHunter
 	url = https://github.com/Liu-Feng-deeplearning/CoverHunter.git
 	branch = main
-[submodule "csi_models/re-move"]
-	path = csi_models/re-move
-	url = https://github.com/furkanyesiler/re-move.git
+[submodule "csi_models/remove"]
+	path = csi_models/remove
+	url = https://github.com/cncPomper/re-move
 	branch = master
 [submodule "csi_models/lyricover"]
 	path = csi_models/lyricover
