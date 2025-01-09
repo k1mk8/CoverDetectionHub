@@ -229,3 +229,4 @@ A browser tab should open with two tabs:
 - improving the [LyriCover](https://github.com/DawidRucinski/LyriCover) model for more sophisticated audio features exctraction; training on a larger subset of SHS100k after improving performance of the model
 - possible co-operation with [ZAIKS](https://zaiks.org.pl/) to form a new dataset and deploy the solution
 - performing more experiments, similar to "Injected Abracadabra" or others found in the literature
+- augmentations are a very interesting field of experiments
