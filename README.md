@@ -92,7 +92,7 @@ We currently have 3 main cover-detection models:
 1. ByteCover:
 - A neural-based approach, leveraging specialized embeddings for audio.
 - Checkpoints are loaded from bytecover_checkpoint_path.
-  
+ 
 2. CoverHunter:
 - Another deep learning–based model, configured via a YAML file and checkpoint directory.
 - Paths in paths.yaml guide where to load the model weights.
@@ -102,11 +102,14 @@ We currently have 3 main cover-detection models:
 - It incorporates lyric transcription (via Whisper) and tonal features to gauge similarity.
 Each of these models outputs a similarity score for a given pair of audio files. A threshold then decides if two songs are considered “covers.”
 
+4. Re-move:
+- From the paper "Less is more: Faster and better music version identification with embedding distillation" (https://arxiv.org/pdf/2010.03284).
+
 ### Feature Extraction Methods
 Apart from the main deep-learning models, we also included two simpler methods for demonstration and baseline comparison:
 
-MFCC (Mel-Frequency Cepstral Coefficients)
-Spectral Centroid
+- MFCC (Mel-Frequency Cepstral Coefficients)
+- Spectral Centroid
 These can be used to compare two audio files based on feature similarity (e.g., cosine similarity).
 
 ## Available Datasets
