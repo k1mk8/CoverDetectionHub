@@ -16,7 +16,7 @@ if __name__ == "__main__":
         "--model",
         type=str,
         required=True,
-        choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"],
+        choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid", "Remove"],
         help="The name of the model to evaluate (ByteCover, CoverHunter, Lyricover, MFCC, Spectral Centroid)."
     )
 

@@ -21,7 +21,7 @@ app1 = gr.Interface(
     inputs=[
         gr.Audio(type="filepath", label="Query Song"),
         gr.Audio(type="filepath", label="Potential Cover Song"),
-        gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"], value="ByteCover", label="Choose CSI Model"),
+        gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid", "Remove"], value="ByteCover", label="Choose CSI Model"),
         gr.Slider(minimum=0.5, maximum=1.0, step=0.001, value=0.99, label="Threshold")
     ],
     outputs=[
@@ -36,7 +36,7 @@ app1 = gr.Interface(
 app2 = gr.Interface(
     fn=gradio_test_interface,
     inputs=[
-        gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid"], value="ByteCover", label="Choose CSI Model"),
+        gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Spectral Centroid", "Remove"], value="ByteCover", label="Choose CSI Model"),
         gr.Dropdown(choices=["Covers80", "Covers80but10", "Injected Abracadabra"], value="Covers80", label="Choose Dataset"),
     ],
     outputs=[

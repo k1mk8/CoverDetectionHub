@@ -4,6 +4,8 @@ import torch
 import numpy as np
 from feature_extraction.feature_extraction import extract_features_cqt
 
+import essentia.standard as estd
+
 TARGET_SR = 22050
 MAX_LEN = 100
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -118,3 +120,57 @@ def validate_audio(filepath):
     output_filepath = os.path.splitext(filepath)[0] + ".wav"
     ffmpeg.input(filepath).output(output_filepath, format="wav", ac=1, ar="16000").run(overwrite_output=True)
     return output_filepath, None
+
+# Audio preprocessing
+def crema(audio_file, fs=44100, hop_length=512):
+    """
+    Compute "convolutional and recurrent estimators for music analysis" (CREMA)
+    and resample so that it's reported in hop_length intervals
+    NOTE: This code is a bit finnecky, and is recommended for Python 3.5.
+    Check `wrapper_cream_feature` for the actual implementation.
+
+    Returns
+    -------
+    crema: ndarray(n_frames, 12)
+        The crema coefficients at each frame
+    """
+    from crema.models.chord import ChordModel
+    from scipy import interpolate
+
+    audio_vector = estd.MonoLoader(filename=audio_file, sampleRate=fs)()
+
+    model = ChordModel()
+    data = model.outputs(y=audio_vector, sr=fs)
+    fac = (float(fs) / 44100.0) * 4096.0 / hop_length
+    times_orig = fac * np.arange(len(data["chord_bass"]))
+    nwins = int(np.floor(float(audio_vector.size) / hop_length))
+    times_new = np.arange(nwins)
+    interp = interpolate.interp1d(
+        times_orig, data["chord_pitch"].T, kind="nearest", fill_value="extrapolate"
+    )
+    return interp(times_new).T
+
+def process_crema(audio_path, output_dir="", output_file_pt=""):
+
+    if os.path.exists(os.path.join(output_dir, output_file_pt)) == False:
+        data_list = []
+        labels_list = []
+    else:
+        test = torch.load(os.path.join(output_dir, output_file_pt))
+        data_list = test["data"]
+        labels_list = test["labels"]
+
+    #out_dict = dict()
+    #out_dict["crema"] = crema(audio_path)
+
+    #label = audio_path.split("/")[-2]
+
+    temp_crema = crema(audio_path)
+
+    #os.makedirs(output_dir, exist_ok=True)
+
+    idxs = np.arange(0, temp_crema.shape[0], 8)
+    temp_tensor = torch.from_numpy(temp_crema[idxs].T)
+
+    # expanding in the pitch dimension, and adding the feature tensor and its label to the respective lists
+    return torch.cat((temp_tensor, temp_tensor))[:23].unsqueeze(0)

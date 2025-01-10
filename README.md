@@ -20,7 +20,8 @@ A framework and “hub” for **music cover identification**, enabling researche
 7. [Gradio App Usage](#gradio-app-usage)
 8. [Experiments and Tests](#experiments-and-tests)
 9. [Future Challenges](#future-challenges)
-10. [Bibliography Review](#bibliography-review)
+10. [Performance Metrics](#performance-metrics)
+11. [Bibliography Review](#bibliography-review)
 
 
 ---
@@ -91,7 +92,7 @@ We currently have 3 main cover-detection models:
 1. ByteCover:
 - A neural-based approach, leveraging specialized embeddings for audio.
 - Checkpoints are loaded from bytecover_checkpoint_path.
-  
+ 
 2. CoverHunter:
 - Another deep learning–based model, configured via a YAML file and checkpoint directory.
 - Paths in paths.yaml guide where to load the model weights.
@@ -101,11 +102,15 @@ We currently have 3 main cover-detection models:
 - It incorporates lyric transcription (via Whisper) and tonal features to gauge similarity.
 Each of these models outputs a similarity score for a given pair of audio files. A threshold then decides if two songs are considered “covers.”
 
+4. Re-move:
+- From the paper "Less is more: Faster and better music version identification with embedding distillation" (https://arxiv.org/pdf/2010.03284).
+
 ### Feature Extraction Methods
 Apart from the main deep-learning models, we also included two simpler methods for demonstration and baseline comparison:
 
-MFCC (Mel-Frequency Cepstral Coefficients)
-Spectral Centroid
+- MFCC (Mel-Frequency Cepstral Coefficients)
+- Spectral Centroid
+
 These can be used to compare two audio files based on feature similarity (e.g., cosine similarity).
 
 ## Available Datasets
@@ -176,6 +181,31 @@ A browser tab should open with two tabs:
 |  <br> [Covers80](http://labrosa.ee.columbia.edu/projects/coversongs/covers80/) |   <li>The dataset contains 80 songs, with 2 different performances of each song by different artists (160 tracks in total).  </li>   <br> <li>All audio files are encoded as 32 kbps MP3 (mono, 16 kHz sampling rate, bandwidth limited to 7 kHz). </li>  <br> Thoughts: We will not use the Covers80 dataset as primary dataset  because it is relatively small and is old (2007). Additionally, the audio files are of low quality (32 kbps, 16 kHz mono).The dataset was assembled somewhat randomly, and it may not provide the diversity or representativeness. However, it has become a CSI systems benchmark, that is why, if we have enough time, we will try to include it in out project. <br> Dataset appeared in a paper [THE 2007 LABROSA COVER SONG DETECTION SYSTEM](http://labrosa.ee.columbia.edu/~dpwe/pubs/EllisC07-covers.pdf). |
 | [SHS100K](http://millionsongdataset.com/secondhand/) | <li> Contains metadata and audio features for a large number of songs and their covers. </li> <li> Includes a diverse range of musical genres </li>   <li> Metadata: song title, artist, release year </li><br> Thoughts: **This dataset served us as primary for training purposes** |
 | [ZAIKS dataset](https://zaiks.org.pl/) | It's a friendly organization in Poland. The organization will provide a music dataset for testing purposes - these will probably be Polish songs and their famous cover versions. |
+
+
+## Performance Metrics
+
+### Dataset: Injected Abracadabra 
+
+| Dataset / Model          | Mean Average Precision (mAP) | Precision at 10 (P@10) / mP@10 | Mean Rank of First Correct Cover (MR1 / mMR1) |
+|--------------------------|------------------------------|---------------------------------|-----------------------------------------------|
+| **Model: re-move**       | **0.86600**                 | 0.87500                         | 1.00000                                       |
+| **Model: CoverHunter**   | 0.78400                     | 0.90000                         | 1.00000                                       |
+| **Model: Lyricover**     | 0.82029                     | 0.90000                         | 1.00000                                       |
+| **Model: ByteCover**     | 0.51435                     | 0.70000                         | 1.00000                                       |
+| **MFCC**                 | 0.24015                     | 0.30000                         | 3.00000                                       |
+| **Spectral Centroid**    | 0.24159                     | 0.30000                         | 3.00000                                       |
+
+### Dataset: Covers80 
+
+| Dataset / Model          | Mean Average Precision (mAP) | Precision at 10 (P@10) / mP@10 | Mean Rank of First Correct Cover (MR1 / mMR1) |
+|--------------------------|------------------------------|---------------------------------|-----------------------------------------------|
+| **Model: re-move**       | **0.83020**                 | 0.09695                         | 8.04268                                       |
+| **Model: Lyricover**     | 0.83425                     | 0.09939                         | 7.41463                                       |
+| **Model: CoverHunter**   | 0.74161                     | 0.09268                         | 9.52439                                       |
+| **Model: ByteCover**     | 0.52172                     | 0.07927                         | 14.78049                                      |
+| **MFCC**                 | 0.24015                     | 0.30000                         | 3.00000                                       |
+| **Spectral Centroid**    | 0.04352                     | 0.00793                         | 76.80488                                      |
 
 ---
 

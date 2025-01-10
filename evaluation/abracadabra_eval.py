@@ -8,6 +8,7 @@ from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
+from csi_models.RemoveModel import RemoveModel
 from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
 from evaluation.metrics import compute_mean_metrics_for_rankings
 
@@ -141,7 +142,8 @@ def evaluate_on_injected_abracadabra(model_name, k=8):
         "CoverHunter": CoverHunterModel,
         "Lyricover": LyricoverModel,
         "MFCC": MFCCModel,
-        "Spectral Centroid": SpectralCentroidModel
+        "Spectral Centroid": SpectralCentroidModel,
+        "Remove": RemoveModel
     }
 
     if model_name not in model_mapping:
