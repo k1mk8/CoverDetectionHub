@@ -28,19 +28,19 @@ class RemoveModel(ModelBase):
             sys.path.insert(0, remove_path)
 
         # Load the model
-        self.model = self._load_model()
         self.emb_size = 256
+        self.model = self._load_model()
 
     def _load_model(self):
 
-        model = MOVEModel(emb_size=self.emb_size)
+        model = MOVEModel(self.emb_size)
 
         # Ensure checkpoint directory exists
         if not os.path.exists(self.checkpoint_dir):
             raise FileNotFoundError(f"Checkpoint directory not found: {self.checkpoint_dir}")
 
         # Load hyperparameters
-        model.load_state_dict(torch.load(self.checkpoint_dir, map_location="cpu"))
+        model.load_state_dict(torch.load(self.checkpoint_dir, map_location="cpu", weights_only=True))
         # Load model parameters
         #epoch = model.load_model_parameters(self.checkpoint_dir)
 
@@ -54,9 +54,14 @@ class RemoveModel(ModelBase):
         # Preprocess audio files to CSI features
         features1 = process_crema(audio1_path).to(self.device)
         features2 = process_crema(audio2_path).to(self.device)
-
+        features1 = features1.unsqueeze(0)
+        features2 = features2.unsqueeze(0)
+        print(features1)
+        print(features1.shape)
         # Pass features through the model to obtain embeddings
         with torch.no_grad():
+            self.model.eval()
+
             embedding1 = self.model(features1)
             embedding2 = self.model(features2)
 
@@ -67,9 +72,10 @@ class RemoveModel(ModelBase):
     def compute_embedding(self, audio_path: str) -> torch.Tensor:
         # Preprocess audio file to CSI features
         features = process_crema(audio_path).to(self.device)
-
+        features = features.unsqueeze(0)
         # Pass features through the model to obtain embeddings
         with torch.no_grad():
+            self.model.eval()
             embeddings = self.model(features)
 
         return embeddings
@@ -79,7 +85,7 @@ class RemoveModel(ModelBase):
         similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
         return similarity.item()
 
-#remove = RemoveModel()
-#similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
-#print(similarity)
+remove = RemoveModel()
+similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
+print(similarity)
 # embedding = bytecover.compute_embedding("song1.wav")
