@@ -133,7 +133,7 @@ Launch the Gradio interface:
 
 A browser tab should open with two tabs:
 1. Cover Song Identification
- - Upload two audio files (e.g., .mp3), select a model (ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid), and set a threshold.
+ - Upload two audio files (e.g., .mp3, formats from [python-soundfile](https://python-soundfile.readthedocs.io/en/0.11.0/) are supported), select a model (ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid), and set a threshold.
  - The interface will compute a similarity score and return whether it considers them covers.
 2. Model Testing
    - Choose a CSI model (ByteCover, CoverHunter, MFCC, Spectral Centroid).

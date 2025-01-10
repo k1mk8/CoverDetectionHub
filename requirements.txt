@@ -17,6 +17,7 @@ decorator==5.1.1
 docker-pycreds==0.4.0
 eval_type_backport==0.2.2
 exceptiongroup==1.2.2
+essentia==2.1b6.dev1110
 fastapi==0.115.6
 ffmpeg-python==0.2.0
 ffmpy==0.5.0
@@ -67,7 +68,7 @@ pillow==10.2.0
 platformdirs==4.3.6
 pluggy==1.5.0
 pooch==1.8.2
-protobuf==5.29.2
+protobuf==3.20.3
 psutil==6.1.1
 pycparser==2.22
 pydantic==2.10.4
@@ -111,6 +112,7 @@ tqdm==4.67.1
 typeguard==2.13.3
 typer==0.15.1
 typing_extensions==4.12.2
+tables==3.10.1
 tzdata==2024.2
 urllib3==2.3.0
 uvicorn==0.34.0
