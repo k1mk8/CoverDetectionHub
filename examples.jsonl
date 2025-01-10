@@ -1,0 +1,6 @@
+["datasets/example_audio/Silent-Night-Elvis.mp3", "datasets/example_audio/Silent-Night.mp3", "ByteCover", 0.97]
+["datasets/example_audio/Silent-Night-Elvis.mp3", "datasets/example_audio/Silent-Night.mp3", "CoverHunter", 0.8]
+["datasets/example_audio/Steve_Miller Band-Abracadabra.mp3", "datasets/example_audio/Sugar Ray-Abracadabra.mp3", "Lyricover", 0.6]
+["datasets/example_audio/Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "datasets/example_audio/Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.6]
+["datasets/example_audio/Steve_Miller Band-Abracadabra.mp3", "datasets/example_audio/Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "CoverHunter", 0.8]
+["datasets/example_audio/Sugar Ray-Abracadabra.mp3", "datasets/example_audio/Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.8]

@@ -1,19 +1,20 @@
 # gradio_app.py
 
+import json
 import gradio as gr
 
 # Import the two Gradio interface functions
 from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
-# Example usage (the same examples you had)
-examples = [
-    ["datasets\example_audio\Silent-Night-Elvis.mp3", "datasets\example_audio\Silent-Night.mp3", "ByteCover", 0.97],
-    ["datasets\example_audio\Silent-Night-Elvis.mp3", "datasets\example_audio\Silent-Night.mp3", "CoverHunter", 0.8],
-    ["datasets\example_audio\Steve_Miller Band-Abracadabra.mp3", "datasets\example_audio\Sugar Ray-Abracadabra.mp3", "Lyricover", 0.6],
-    ["datasets\example_audio\Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "datasets\example_audio\Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.6],
-    ["datasets\example_audio\Steve_Miller Band-Abracadabra.mp3", "datasets\example_audio\Britney_Spears_I_Can_t_Get_No_Satisfaction.mp3", "CoverHunter", 0.8],
-    ["datasets\example_audio\Sugar Ray-Abracadabra.mp3", "datasets\example_audio\Rolling_Stones_I_Can_t_Get_No_Satisfaction.mp3", "Lyricover", 0.8],
-]
+
+def parse_jsonl(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            data.append(json.loads(line.strip()))
+    return data
+
+examples = parse_jsonl('examples.jsonl')
 
 app1 = gr.Interface(
     fn=gradio_cover_interface,
@@ -48,4 +49,4 @@ app2 = gr.Interface(
 demo = gr.TabbedInterface([app1, app2], ["Cover Song Identification", "Model Testing"])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share=True)
