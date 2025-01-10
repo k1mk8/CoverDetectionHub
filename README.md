@@ -59,7 +59,7 @@ A framework and “hub” for **music cover identification**, enabling researche
   - Update or create `configs/paths.yaml` to point to provide paths for datasets.
 
 The config has been tested on Linux and Windows machines with CUDA. Please note you may need to install software from **Technology stack** section "Needed to run".
-   
+The checkpoints are stored [here](https://drive.google.com/drive/folders/1YMCLLi1HVybz_knO3yW-io0ul3AK_Ku5?usp=sharing).
 ## Project Overview
 
 This project is part of a Music Information Retrieval (MIR) course. We developed a hub for cover detection, providing:
@@ -128,7 +128,7 @@ As described in this document, we decided mainly to use SHS100k dataset for trai
 
 The dataset is organised into 9998 cliques (groups of different performances of a single sample; we consider all performances from one particular clique to be each other's cover). Each clique contains several samples. Additionally, there is provided the title of a song, its **YouTube video ID** and SecondHandSongs ID. We managed to obtain approximately 78k samples, whose size was **~270GB**.
 
-For further processing, the main identification of each individual sample is the **YouTube video ID**.
+For further processing, the main identification of each individual sample is its **YouTube video ID**.
 
 ## Gradio App Usage
 
