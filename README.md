@@ -177,6 +177,31 @@ A browser tab should open with two tabs:
 | [SHS100K](http://millionsongdataset.com/secondhand/) | <li> Contains metadata and audio features for a large number of songs and their covers. </li> <li> Includes a diverse range of musical genres </li>   <li> Metadata: song title, artist, release year </li><br> Thoughts: **This dataset served us as primary for training purposes** |
 | [ZAIKS dataset](https://zaiks.org.pl/) | It's a friendly organization in Poland. The organization will provide a music dataset for testing purposes - these will probably be Polish songs and their famous cover versions. |
 
+
+## Performance Metrics
+
+### Dataset: Injected Abracadabra 
+
+| Dataset / Model          | Mean Average Precision (mAP) | Precision at 10 (P@10) / mP@10 | Mean Rank of First Correct Cover (MR1 / mMR1) |
+|--------------------------|------------------------------|---------------------------------|-----------------------------------------------|
+| **Model: re-move**       | **0.8659987034428525**       | 0.875                           | 1.0                                           |
+| **Model: CoverHunter**   | 0.7840044358566254           | 0.9                             | 1.0                                           |
+| **Model: Lyricover**     | 0.8202867621602894           | 0.9                             | 1.0                                           |
+| **Model: ByteCover**     | 0.5143479907863201           | 0.7                             | 1.0                                           |
+| **MFCC**                 | 0.24015004224309588          | 0.3                             | 3.0                                           |
+| **Spectral Centroid**     | 0.24159462216745864          | 0.3                             | 3.0                                           |
+
+### Dataset: covers80
+
+| Dataset / Model          | Mean Average Precision (mAP) | Precision at 10 (P@10) / mP@10 | Mean Rank of First Correct Cover (MR1 / mMR1) |
+|--------------------------|------------------------------|---------------------------------|-----------------------------------------------|
+| **Model: re-move**       | **0.8302011578435576**       | 0.09695121951219493             | 8.042682926829269                              |
+| **Model: Lyricover**     | 0.8342472892321786           | 0.09939024390243881             | 7.414634146341464                              |
+| **Model: CoverHunter**   | 0.7416111409634292           | 0.09268292682926808             | 9.524390243902438                              |
+| **Model: ByteCover**     | 0.5217194473504123           | 0.07926829268292666             | 14.78048780487805                              |
+| **MFCC**                 | 0.24015004224309588          | 0.3                             | 3.0                                           |
+| **Spectral Centroid**    | 0.04352416616344724          | 0.007926829268292683            | 76.8048780487805                              |
+
 ---
 
 ## Project schedule
