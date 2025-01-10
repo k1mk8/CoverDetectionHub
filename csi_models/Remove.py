@@ -9,7 +9,7 @@ if remove_path not in sys.path:
 
 from csi_models.ModelBase import ModelBase
 
-from remove.models.move_model import MOVEModel
+from csi_models.remove.models.move_model import MOVEModel
 from feature_extraction.audio_preprocessing import process_crema
 
 class RemoveModel(ModelBase):
@@ -31,7 +31,7 @@ class RemoveModel(ModelBase):
         self.model = self._load_model()
         self.emb_size = 256
 
-    def _load_model(self) -> Model:
+    def _load_model(self):
 
         model = MOVEModel(emb_size=self.emb_size)
 
@@ -79,7 +79,7 @@ class RemoveModel(ModelBase):
         similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
         return similarity.item()
 
-remove = RemoveModel()
-similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
-print(similarity)
+#remove = RemoveModel()
+#similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
+#print(similarity)
 # embedding = bytecover.compute_embedding("song1.wav")

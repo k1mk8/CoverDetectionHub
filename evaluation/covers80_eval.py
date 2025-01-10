@@ -8,6 +8,7 @@ from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
+from csi_models.Remove import RemoveModel
 from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
 from evaluation.metrics import compute_mean_metrics_for_rankings
 
@@ -107,7 +108,8 @@ def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
         "CoverHunter": CoverHunterModel,
         "Lyricover": LyricoverModel,
         "MFCC": MFCCModel,
-        "Spectral Centroid": SpectralCentroidModel
+        "Spectral Centroid": SpectralCentroidModel,
+        "Remove": RemoveModel
     }
 
     if model_name not in model_mapping:
