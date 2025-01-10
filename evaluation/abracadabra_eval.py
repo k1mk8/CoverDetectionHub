@@ -125,7 +125,7 @@ def compute_embeddings(files_and_labels, model: ModelBase, progress=gr.Progress(
     return embeddings
 
 
-def evaluate_on_injected_abracadabra(model_name, k=10):
+def evaluate_on_injected_abracadabra(model_name, k=8):
     """
     Loads the dataset, computes rankings per song,
     and calculates mAP, mP@k, mMR1.
@@ -159,15 +159,16 @@ def evaluate_on_injected_abracadabra(model_name, k=10):
 
     # Compute aggregate metrics
     metrics = compute_mean_metrics_for_rankings(ranking, k=k)
+    print(metrics)
     logging.info("Evaluation complete. Results:")
     logging.info(f"Model: {model_name}")
     logging.info(f"Mean Average Precision (mAP): {metrics['mAP']}")
-    logging.info(f"Precision at {k} (mP@{k}): {metrics[f'mP@{k}']}")
+    logging.info(f"Precision at {k} (mP@{k}): {metrics[f'mP@k']}")
     logging.info(f"Mean Rank of First Correct Cover (mMR1): {metrics['mMR1']}")
 
     return {
         "Model": model_name,
         "Mean Average Precision (mAP)": metrics["mAP"],
-        f"Precision at {k} (mP@{k})": metrics[f"mP@{k}"],
+        f"Precision at {k} (mP@{k})": metrics[f"mP@k"],
         "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
     }
