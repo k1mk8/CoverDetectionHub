@@ -110,6 +110,7 @@ Apart from the main deep-learning models, we also included two simpler methods f
 
 - MFCC (Mel-Frequency Cepstral Coefficients)
 - Spectral Centroid
+
 These can be used to compare two audio files based on feature similarity (e.g., cosine similarity).
 
 ## Available Datasets
