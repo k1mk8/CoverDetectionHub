@@ -1,3 +1,12 @@
+import os
+import sys
+import torch
+import yaml
+
+remove_path = os.path.abspath("./csi_models/remove")
+if remove_path not in sys.path:
+    sys.path.insert(0, remove_path)
+
 from csi_models.ModelBase import ModelBase
 
 from remove.models.move_model import MOVEModel
