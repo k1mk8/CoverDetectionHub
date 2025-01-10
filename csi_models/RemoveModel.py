@@ -56,8 +56,6 @@ class RemoveModel(ModelBase):
         features2 = process_crema(audio2_path).to(self.device)
         features1 = features1.unsqueeze(0)
         features2 = features2.unsqueeze(0)
-        print(features1)
-        print(features1.shape)
         # Pass features through the model to obtain embeddings
         with torch.no_grad():
             self.model.eval()
@@ -85,7 +83,7 @@ class RemoveModel(ModelBase):
         similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2)
         return similarity.item()
 
-remove = RemoveModel()
-similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
-print(similarity)
+#remove = RemoveModel()
+#similarity = remove.compute_similarity_between_files("datasets/example_audio/L3xPVGosADQ.m4a", "datasets/example_audio/3ahbE6bcVf8.m4a")
+#print(similarity)
 # embedding = bytecover.compute_embedding("song1.wav")

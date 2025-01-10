@@ -8,7 +8,7 @@ from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
-from csi_models.Remove import RemoveModel
+from csi_models.RemoveModel import RemoveModel
 from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
 from evaluation.metrics import compute_mean_metrics_for_rankings
 
