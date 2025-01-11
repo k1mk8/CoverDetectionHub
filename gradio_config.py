@@ -1,0 +1,1 @@
+public_dashboard = True #if you would like to have public URL for the dashboard, set this to True. Otherwise keep this as False.
