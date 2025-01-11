@@ -3,7 +3,6 @@
 <div align="center" width="100%">
    <img src="img/cover_detection_hub.png" width="60%" alt="Cover Detection Hub">
 </div>
-
 Authors: Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
 
 ---
@@ -300,3 +299,5 @@ The selection of metrics is based on Mirex Cover Song Identification Contest.
 - possible co-operation with [ZAIKS](https://zaiks.org.pl/) to form a new dataset and deploy the solution
 - performing more experiments, similar to "Injected Abracadabra" or others found in the literature
 - augmentations are a very interesting field of experiments
+
+The logo has been designed using DALL-E model.
