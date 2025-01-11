@@ -108,6 +108,8 @@ Each of these models outputs a similarity score for a given pair of audio files.
 
 4. Re-move:
 - From the paper "Less is more: Faster and better music version identification with embedding distillation" (https://arxiv.org/pdf/2010.03284).
+- It was training with a feature that compute "convolutional and recurrent estimators for music analysis" (CREMA)
+- The model is lightweight and training fast
 
 ### Feature Extraction Methods
 Apart from the main deep-learning models, we also included two simpler methods for demonstration and baseline comparison:
@@ -129,13 +131,13 @@ A smaller variant with only 10 songs (for quick testing).
 3. Injected Abracadabra
 A synthetic dataset where a portion of “Abracadabra” by Steve Miller Band is injected into other audio samples, as described in [Batlle-Roca et al.](https://arxiv.org/pdf/2407.14364).
 
-**Note: The actual training of ByteCover, CoverHunter, and Lyricover was performed on SHS100k, using a university server with GPU machines. The Covers80-related datasets are primarily for testing and demonstration.**
+**Note: The actual training of ByteCover, CoverHunter, Remove and Lyricover was performed on SHS100k, using a university server with GPU machines. The Covers80-related datasets are primarily for testing and demonstration.**
 
 ### Training dataset
 
 As described in this document, we decided mainly to use SHS100k dataset for training. We based on metadata [file](https://github.com/Orfium/bytecover/blob/master/data/interim/shs100k.csv) from [bytecover](https://github.com/Orfium/bytecover) repository. 
 
-The dataset is organised into 9998 cliques (groups of different performances of a single sample; we consider all performances from one particular clique to be each other's cover). Each clique contains several samples. Additionally, there is provided the title of a song, its **YouTube video ID** and SecondHandSongs ID. We managed to obtain approximately 78k samples, whose size was **~270GB**.
+The dataset is organised into 9998 cliques (groups of different performances of a single sample; we consider all performances from one particular clique to be each other's cover). Each clique contains several samples. Additionally, there is provided the title of a song, its **YouTube video ID** and SecondHandSongs ID. We managed to obtain approximately 78k samples, whose size was **~300GB** (Some were deleted, approx ~30GB).
 
 For further processing, the main identification of each individual sample is its **YouTube video ID**.
 
@@ -150,10 +152,10 @@ Launch the Gradio interface:
 
 A browser tab should open with two tabs:
 1. Cover Song Identification
- - Upload two audio files (e.g., .mp3, formats from [python-soundfile](https://python-soundfile.readthedocs.io/en/0.11.0/) are supported), select a model (ByteCover, CoverHunter, Lyricover, MFCC, or Spectral Centroid), and set a threshold.
+ - Upload two audio files (e.g., .mp3, formats from [python-soundfile](https://python-soundfile.readthedocs.io/en/0.11.0/) are supported), select a model (ByteCover, CoverHunter, Lyricover, Remove, MFCC, or Spectral Centroid), and set a threshold.
  - The interface will compute a similarity score and return whether it considers them covers.
 2. Model Testing
-   - Choose a CSI model (ByteCover, CoverHunter, MFCC, Spectral Centroid).
+   - Choose a CSI model (ByteCover, CoverHunter, Remove, MFCC, Spectral Centroid).
    - Pick a dataset (Covers80, Covers80but10, or Injected Abracadabra).
    - Select a threshold. The system then computes evaluation metrics (mAP, Precision@10, MR1, etc.) on that dataset, printing a summary.
 
