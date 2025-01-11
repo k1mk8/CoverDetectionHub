@@ -1,6 +1,10 @@
 # CoverDetectionHub
 
-Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
+<div style="text-align:center">
+   <img src="img/cover_detection_hub.png" center width="60%" alt="Cover Detection Hub">
+</div>
+
+Authors: Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
 
 ---
 
