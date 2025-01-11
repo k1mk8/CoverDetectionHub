@@ -5,6 +5,7 @@ from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidMod
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
+from csi_models.RemoveModel import RemoveModel
 
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
@@ -29,7 +30,8 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
         "CoverHunter": CoverHunterModel,
         "Lyricover": LyricoverModel,
         "MFCC": MFCCModel,
-        "Spectral Centroid": SpectralCentroidModel
+        "Spectral Centroid": SpectralCentroidModel,
+        "Remove": RemoveModel
     }
 
     if model_name not in model_mapping:
