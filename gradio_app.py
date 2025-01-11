@@ -2,7 +2,7 @@
 
 import json
 import gradio as gr
-from gradio_config import public_dashboard
+from configs.gradio_config import public_dashboard
 # Import the two Gradio interface functions
 from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
