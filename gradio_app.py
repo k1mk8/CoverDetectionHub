@@ -2,7 +2,7 @@
 
 import json
 import gradio as gr
-
+from gradio_config import public_dashboard
 # Import the two Gradio interface functions
 from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
 
@@ -49,4 +49,4 @@ app2 = gr.Interface(
 demo = gr.TabbedInterface([app1, app2], ["Cover Song Identification", "Model Testing"])
 
 if __name__ == "__main__":
-    demo.launch(share=True)
+    demo.launch(share=public_dashboard)
