@@ -1,7 +1,7 @@
 # CoverDetectionHub
 
-<div style="text-align:center">
-   <img src="img/cover_detection_hub.png" center width="60%" alt="Cover Detection Hub">
+<div align="center" width="100%">
+   <img src="img/cover_detection_hub.png" width="60%" alt="Cover Detection Hub">
 </div>
 
 Authors: Kamil Szczepanik, Dawid Ruciński, Piotr Kitłowski
