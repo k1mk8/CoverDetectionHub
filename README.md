@@ -26,6 +26,7 @@ A framework and “hub” for **music cover identification**, enabling researche
 9. [Future Challenges](#future-challenges)
 10. [Performance Metrics](#performance-metrics)
 11. [Bibliography Review](#bibliography-review)
+12. [Unit Tests](#unit-tests)
 
 
 ---
