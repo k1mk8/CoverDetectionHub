@@ -101,9 +101,11 @@ We currently have 3 main cover-detection models:
 - Another deep learning–based model, configured via a YAML file and checkpoint directory.
 - Paths in paths.yaml guide where to load the model weights.
 
-3. Lyricover:
+3. [LyriCover](https://github.com/DawidRucinski/LyriCover):
 - Inspired by the paper "The Words Remain the Same: Cover Detection with Lyrics Transcription".
-- It incorporates lyric transcription (via Whisper) and tonal features to gauge similarity.
+- It is our **own implementation** joining text extraction using OpenAI Whisper with n-gram representation and spectral features.
+- The result is obtained via a simple neural network that joins the predictions.
+- 
 Each of these models outputs a similarity score for a given pair of audio files. A threshold then decides if two songs are considered “covers.”
 
 4. Re-move:
@@ -160,13 +162,33 @@ A browser tab should open with two tabs:
    - Select a threshold. The system then computes evaluation metrics (mAP, Precision@10, MR1, etc.) on that dataset, printing a summary.
 
 
-## Experiments and Tests
+## Performed experiments
 1. Synthetic Injection (“Injected Abracadabra”)
    - Based on the partial injection method from [Batlle-Roca et al.](https://arxiv.org/pdf/2407.14364).
   - We inject a segment of an original piece (Abracadabra) into other tracks to create partial covers, then measure how well each model detects the covers.
+2. Covers80 evaluation - the samples were compared on a "pairwise" basis, i.e., pairs of tracks were selected either from the same groups (in which case they were considered covers) or from different groups (in which case they were classified as non-covers).
 
-2. Unit Tests
-   - We maintain a `tests/` directory with `pytest` test files
+## Unit Tests
+
+We maintain a `tests/` directory with `pytest` test files. Below is a summary of the test coverage:
+
+### Path Validation
+- **`test_paths_exist`**: Verifies that all paths in `configs/paths.yaml` exist and match their expected type (directory or file).
+
+### Covers80 Dataset Integrity
+- **`test_gather_covers80_dataset_files`**: Ensures `gather_covers80_dataset_files` returns a non-empty list of `(audio_path, label)` tuples.
+- **`test_covers80_random_subfolders_have_two_mp3s`**: Randomly checks subfolders in `covers80_data_dir` for at least two `.mp3` files.
+- **`test_gather_covers80but10_dataset_files`**: Similar to the above but for a dataset variant.
+- **`test_covers80but10_random_subfolders_have_two_mp3s`**: Verifies subfolders in `covers80but10_data_dir` contain at least two `.mp3` files.
+
+### Ranking Metrics
+- **`test_compute_metrics_for_ranking_no_relevant`**: Tests metrics when no relevant items are in the ranking.
+- **`test_compute_metrics_for_ranking_all_relevant`**: Tests metrics when all items in the ranking are relevant.
+- **`test_compute_metrics_for_ranking_mixed`**: Validates metrics for mixed relevant and irrelevant items.
+- **`test_compute_mean_metrics_for_rankings_empty`**: Ensures mean metrics for an empty ranking set return 0.
+- **`test_compute_mean_metrics_for_rankings_single`**: Verifies mean metrics match individual metrics for a single ranking.
+- **`test_compute_mean_metrics_for_rankings_multiple`**: Validates mean metrics across multiple rankings against manual calculations.
+
 
 ## Bibliography Review
 
@@ -190,6 +212,8 @@ A browser tab should open with two tabs:
 
 
 ## Performance Metrics
+
+The selection of metrics is based on Mirex Cover Song Identification Contest.
 
 ### Dataset: Injected Abracadabra 
 
