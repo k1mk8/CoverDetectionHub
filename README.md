@@ -299,5 +299,6 @@ The selection of metrics is based on Mirex Cover Song Identification Contest.
 - possible co-operation with [ZAIKS](https://zaiks.org.pl/) to form a new dataset and deploy the solution
 - performing more experiments, similar to "Injected Abracadabra" or others found in the literature
 - augmentations are a very interesting field of experiments
+- currently, model Re-Move uses `essentia` package, which unavailable on Windows. This makes the whole app runnable only on unix operating systems. It would be advisable to make own implementation of the necessary methods from this package so that it app is runnable on all systems.
 
 The logo has been designed using DALL-E model.
