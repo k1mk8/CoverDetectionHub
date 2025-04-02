@@ -23,10 +23,16 @@ Purposes for term 25L is to try to develop future challenges from previous imple
 
 ## Planned functionalities
 
-- obtaining Da-Tacos dataset and possibly perform training and evaluation on it
+- obtaining Da-Tacos dataset and uset to improve results of training and evaluation of models
 - improving the [LyriCover](https://github.com/DawidRucinski/LyriCover) model for more sophisticated audio features exctraction; training on a larger subset of SHS100k after improving performance of the model, speed up calculating of actual model
-- performing more experiments, similar to "Injected Abracadabra" or others found in the literature
-- augmentations
+- performing more experiments, similar to "Injected Abracadabra" or others found in the literature for example:
+  - The impact of song fragmentation on identification involves evaluating whether algorithms can accurately identify cover versions based on short excerpts of songs ~ ByteCover3: Accurate Cover Song Identification on Short Queries by Xingjian Du et al. (2023)
+- Augmentations:
+  - Comparing the performance of models trained on the original dataset versus those trained on an augmented version
+  - Analyzing the impact of specific augmentation techniques (e.g., pitch shifting, time stretching, noise addition) on individual performance metrics.
+- Possible results of augmentations:
+  - Increase the diversity of the training data, thereby lowering the risk of the model overfitting
+  - Enhancements in metrics such as accuracy, precision, recall, and mean average precision
 - model for generating covers from given track (if we have capacity to do that - not included in schedule)
 
 
@@ -46,11 +52,11 @@ Main technologies in use:
 - **Week 2 (26.02 - 01.03)**:	Topic selection and overview of projects from previous terms
 - **Week 3 (04.03 - 08.03)**:	Create entrance design proposal
 - **Week 4 (11.03 - 15.03)**:	Design proposal refinement and literature study
-- **Week 5-6 (18.03 - 29.03)**:	Understand of Da-Tacos dataset and use it for testing
-- **Week 7 (01.04 - 05.04)**:	Dataset augmentations for better coverage of diffrent scenarios
-- **Week 8-9 (08.04 - 19.04)**:	Improving the LyriCover model and testing
-- **Week 10-11 (22.04 -3.05)**:	Further improvig of LyriCover and training on larger dataset
-- **Week 12 (06.05 - 10.05)**:	Update and improve UI for new and previous model, fix for created model
+- **Week 5 (18.03 - 22.03)**:	Understand of Da-Tacos dataset and use it for testing
+- **Week 6 (25.03 - 29.03)**:	Dataset augmentations for better coverage of diffrent scenarios
+- **Week 7 (01.04 - 05.04)**:	Improving the LyriCover model and testing
+- **Week 8 (08.04 - 12.04)**:	Further improvig of LyriCover and training on larger dataset
+- **Week 9-12 (15.04 - 10.05)**:	Implementation and testing of new Cover Generator prototype
 - **Week 13 (13.05 - 17.05)**:	Prepare tests for existing code
 - **Week 14 (20.05 - 24.05)**:	Evaluation of the results and prepare for final presentation
 - **Week 15 (27.05 - 31.05)**:   Final presentation and create recording
