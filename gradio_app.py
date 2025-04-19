@@ -37,7 +37,7 @@ app2 = gr.Interface(
     fn=gradio_test_interface,
     inputs=[
         gr.Dropdown(choices=["ByteCover", "CoverHunter", "Lyricover", "MFCC", "Remove"], value="ByteCover", label="Choose CSI Model"),
-        gr.Dropdown(choices=["Covers80", "Covers80but10", "Injected Abracadabra"], value="Covers80", label="Choose Dataset"),
+        gr.Dropdown(choices=["Covers80", "Covers80but10", "Injected Abracadabra","DaTacos"], value="Covers80", label="Choose Dataset"),
     ],
     outputs=[
         gr.Textbox(label="Summary Metrics")

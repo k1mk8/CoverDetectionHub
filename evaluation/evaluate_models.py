@@ -7,6 +7,7 @@ parent_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
 sys.path.append(parent_dir)
 from evaluation.covers80_eval import evaluate_on_covers80
 from evaluation.abracadabra_eval import evaluate_on_injected_abracadabra
+from evaluation.datacos_eval import evaluate_on_datacos
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate cover song detection models on datasets.")
@@ -25,8 +26,8 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         required=True,
-        choices=["covers80", "covers80but10", "injected_abracadabra"],
-        help="The dataset to evaluate on (covers80, covers80but10, injected_abracadabra)."
+        choices=["covers80", "covers80but10", "injected_abracadabra","da_tacos"],
+        help="The dataset to evaluate on (covers80, covers80but10, injected_abracadabra, da_tacos)."
     )
 
     # Add optional argument for precision-at-k
@@ -52,8 +53,13 @@ if __name__ == "__main__":
             model_name=args.model,
             k=args.k
         )
+    elif args.dataset == "da_tacos":
+        result = evaluate_on_datacos(
+            model_name=args.model,
+            k=args.k
+        )
     else:
-        raise ValueError("Unsupported dataset. Choose from covers80, covers80but10, injected_abracadabra.")
+        raise ValueError("Unsupported dataset. Choose from covers80, covers80but10, injected_abracadabra, da_tacos")
 
     # Print the results
     print("Evaluation Results:")
