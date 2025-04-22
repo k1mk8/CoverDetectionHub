@@ -4,7 +4,7 @@ import json
 import gradio as gr
 from configs.gradio_config import public_dashboard
 # Import the two Gradio interface functions
-from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface
+from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface, gradio_generate_cover_interface
 
 
 def parse_jsonl(file_path):
@@ -46,7 +46,22 @@ app2 = gr.Interface(
     description="Select a CSI model, dataset, and threshold to evaluate performance metrics such as mAP, P@10, and MR1."
 )
 
-demo = gr.TabbedInterface([app1, app2], ["Cover Song Identification", "Model Testing"])
+app3 = gr.Interface(
+    fn=gradio_generate_cover_interface,
+    inputs=[
+        gr.Audio(type="filepath", label="Input Song (Melody)"),
+        gr.Slider(minimum=5, maximum=180, value=30, step=1, label="Cover Duration (seconds)")
+    ],
+    outputs=gr.Audio(type="filepath", label="Generated Cover"),
+    title="Cover Generation",
+    description="Upload a melody and choose the desired duration to generate a new cover version using MusicGen."
+)
+
+demo = gr.TabbedInterface([app1, app2, app3], [
+    "Cover Song Identification", 
+    "Model Testing", 
+    "Cover Generation"
+])
 
 if __name__ == "__main__":
     demo.launch(share=public_dashboard)
