@@ -6,6 +6,7 @@ from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
 from csi_models.RemoveModel import RemoveModel
+from generator.generate_cover import generate_cover
 
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
@@ -67,3 +68,7 @@ def gradio_test_interface(model_name, dataset):
         f"Mean Rank of First Correct Cover (MR1): {results.get('Mean Rank of First Correct Cover (mMR1)', 'N/A')}\n"
     )
     return summary_table
+
+def gradio_generate_cover_interface(audio_path, duration):
+    return generate_cover(audio_path, duration)
+
