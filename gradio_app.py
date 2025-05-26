@@ -1,10 +1,21 @@
 # gradio_app.py
-
 import json
 import gradio as gr
 from configs.gradio_config import public_dashboard
-# Import the two Gradio interface functions
-from utils.gradio_wrappers import gradio_cover_interface, gradio_test_interface, gradio_generate_cover_interface
+from utils.gradio_wrappers import (
+    gradio_cover_interface,
+    gradio_test_interface,
+    gradio_generate_cover_interface
+)
+
+def parse_jsonl(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            data.append(json.loads(line.strip()))
+    return data
+
+examples = parse_jsonl('examples.jsonl')
 
 
 def parse_jsonl(file_path):
@@ -49,19 +60,34 @@ app2 = gr.Interface(
 app3 = gr.Interface(
     fn=gradio_generate_cover_interface,
     inputs=[
-        gr.Audio(type="filepath", label="Input Song (Melody)"),
-        gr.Slider(minimum=5, maximum=180, value=30, step=1, label="Cover Duration (seconds)")
+        gr.Audio(type="filepath", label="Input Song (melody + vocals?)"),
+        gr.Slider(minimum=5, maximum=180, value=30, step=1, label="Cover Duration (seconds)"),
+        gr.Radio(choices=["Instrumental", "With Lyrics"],
+                 value="Instrumental",
+                 label="Cover Type"),
+        gr.Dropdown(choices=["tiny", "base", "small", "medium", "large"],
+                    value="medium",
+                    label="Whisper Model (tylko jeśli ‘With Lyrics’)"),
+        gr.Radio(choices=["Female", "Male"],
+                 value="Female",
+                 label="Singer Gender (Bark Voice Style)"),
     ],
-    outputs=gr.Audio(type="filepath", label="Generated Cover"),
-    title="Cover Generation",
-    description="Upload a melody and choose the desired duration to generate a new cover version using MusicGen."
+    outputs=[
+        gr.Audio(type="filepath", label="Generated Cover")
+    ],
+    title="Cover Generation with Bark & MusicGen",
+    description=(
+        "Upload a melodic clip (optionally with vocals).  \n"
+        "- **Instrumental**: otrzymujesz tylko podkład.  \n"
+        "- **With Lyrics**: transkrybujemy Twój fragment (Whisper), a następnie generujemy wokal Barkiem.  \n"
+        "- Wybierz płeć wokalisty, by Bark przyjął odpowiedni styl głosu."
+    )
 )
 
-demo = gr.TabbedInterface([app1, app2, app3], [
-    "Cover Song Identification", 
-    "Model Testing", 
-    "Cover Generation"
-])
+demo = gr.TabbedInterface(
+    [app1, app2, app3],
+    ["Cover Song Identification", "Model Testing", "Cover Generation"]
+)
 
 if __name__ == "__main__":
     demo.launch(share=public_dashboard)
