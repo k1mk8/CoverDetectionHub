@@ -2,21 +2,18 @@ import os
 import torch
 import torchaudio
 import numpy as np
-import soundfile as sf
-import librosa
 from audiocraft.models import MusicGen
-from spleeter.separator import Separator
-import pyworld as pw
-import gradio as gr
 
-# Ensure torch device helper
 if not hasattr(torch, "get_default_device"):
     torch.get_default_device = lambda: "cuda" if torch.cuda.is_available() else "cpu"
 
-# Global MusicGen model cache
 _musicgen_model = None
 
 def _load_audio(path: str, target_sr: int) -> torch.Tensor:
+    """
+    Loads an audio file and resamples it to the target sample rate.
+    Converts stereo to mono by averaging channels.
+    """
     wav, sr = torchaudio.load(path)
     if sr != target_sr:
         wav = torchaudio.transforms.Resample(sr, target_sr)(wav)
@@ -26,6 +23,9 @@ def _load_audio(path: str, target_sr: int) -> torch.Tensor:
 
 
 def _trim_or_pad(wav: torch.Tensor, duration_s: float, sr: int) -> torch.Tensor:
+    """
+    Trims or pads the audio tensor to a specific duration in seconds.
+    """
     max_len = int(duration_s * sr)
     length = wav.shape[-1]
     if length > max_len:
@@ -37,6 +37,11 @@ def _trim_or_pad(wav: torch.Tensor, duration_s: float, sr: int) -> torch.Tensor:
 
 
 def _get_musicgen(device: str = None) -> MusicGen:
+    """
+    Loads and returns the MusicGen model instance.
+    Caches the model to avoid repeated loading.
+    Loads and returns the MusicGen model instance. Caches the model.
+    """
     global _musicgen_model
     if _musicgen_model is None:
         dev = device or torch.get_default_device()
@@ -45,6 +50,10 @@ def _get_musicgen(device: str = None) -> MusicGen:
 
 
 def generate_cover(audio_path: str, duration: int) -> str:
+    """
+    Generates an instrumental cover of a given audio file using MusicGen.
+    Returns the path to the generated audio file or an error message.
+    """
     device = torch.get_default_device()
     try:
         model = _get_musicgen(device)
@@ -59,58 +68,3 @@ def generate_cover(audio_path: str, duration: int) -> str:
         return out_path
     except Exception as e:
         return f"Error generating instrumental cover: {e}"
-
-
-def generate_cover_with_lyrics(audio_path: str, duration: float, alpha: float) -> str:
-    # 1. Load and trim original audio to desired duration
-    wav, sr = torchaudio.load(audio_path)
-    wav = _trim_or_pad(wav, duration, sr)
-    temp_trim = '/tmp/trimmed_input.wav'
-    torchaudio.save(temp_trim, wav, sample_rate=sr)
-
-    # 2. Separate vocals
-    sep = Separator('spleeter:2stems')
-    sep.separate_to_file(temp_trim, '/tmp')
-    base = os.path.join('/tmp', os.path.splitext(os.path.basename(temp_trim))[0])
-    vocals_path = os.path.join(base, 'vocals.wav')
-
-    # 3. Load vocals and convert to float64
-    y_voc, sr_voc = librosa.load(vocals_path, sr=None)
-    y_voc = y_voc.astype(np.float64)
-
-    # 4. WORLD analysis
-    _f0, t = pw.dio(y_voc, sr_voc)
-    f0 = pw.stonemask(y_voc, _f0, t, sr_voc)
-    sp = pw.cheaptrick(y_voc, f0, t, sr_voc)
-    ap = pw.d4c(y_voc, f0, t, sr_voc)
-
-    # 5. Formant shifting (timbre)
-    n_frames, n_bins = sp.shape
-    orig_bins = np.arange(n_bins)
-    src_bins = orig_bins / alpha
-    sp_warped = np.zeros_like(sp)
-    ap_warped = np.zeros_like(ap)
-    for i in range(n_frames):
-        sp_warped[i] = np.interp(orig_bins, src_bins, sp[i], left=sp[i,0], right=sp[i,-1])
-        ap_warped[i] = np.interp(orig_bins, src_bins, ap[i], left=ap[i,0], right=ap[i,-1])
-
-    # 6. Synthesize vocals
-    f0_c = np.ascontiguousarray(f0)
-    sp_c = np.ascontiguousarray(sp_warped)
-    ap_c = np.ascontiguousarray(ap_warped)
-    y_synth = pw.synthesize(f0_c, sp_c, ap_c, sr_voc)
-
-    # 7. Write output
-    out_path = '/tmp/cover_with_lyrics.wav'
-    sf.write(out_path, y_synth, sr_voc)
-
-    inst_path = generate_cover(audio_path, duration)
-
-    inst, sr = librosa.load(inst_path, sr=None)
-    voc, _ = librosa.load(out_path, sr=sr)
-
-    min_len = min(len(inst), len(voc))
-    mix = (inst[:min_len]) * 0.6 + voc[:min_len]
-    result = '/tmp/result.wav'
-    sf.write(result, mix, sr)
-    return result

@@ -6,7 +6,8 @@ from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
 from csi_models.RemoveModel import RemoveModel
-from generator.generate_cover import generate_cover, generate_cover_with_lyrics
+from generator.generate_cover import generate_cover
+from generator.generate_cover_with_lyrics import generate_cover_with_lyrics
 
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
