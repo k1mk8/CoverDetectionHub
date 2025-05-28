@@ -62,25 +62,17 @@ app3 = gr.Interface(
     inputs=[
         gr.Audio(type="filepath", label="Input Song (melody + vocals?)"),
         gr.Slider(minimum=5, maximum=180, value=30, step=1, label="Cover Duration (seconds)"),
-        gr.Radio(choices=["Instrumental", "With Lyrics"],
-                 value="Instrumental",
-                 label="Cover Type"),
-        gr.Dropdown(choices=["tiny", "base", "small", "medium", "large"],
-                    value="medium",
-                    label="Whisper Model (tylko jeśli ‘With Lyrics’)"),
-        gr.Radio(choices=["Female", "Male"],
-                 value="Female",
-                 label="Singer Gender (Bark Voice Style)"),
+        gr.Radio(choices=["Instrumental", "With Lyrics"], value="With Lyrics", label="Cover Type"),
+        gr.Slider(minimum=0.5, maximum=2.0, value=1.0, step=0.01, label="Timbre Shift Factor (alpha)"),
     ],
     outputs=[
         gr.Audio(type="filepath", label="Generated Cover")
     ],
-    title="Cover Generation with Bark & MusicGen",
+    title="Cover Generation with Timbre Shifting",
     description=(
         "Upload a melodic clip (optionally with vocals).  \n"
         "- **Instrumental**: otrzymujesz tylko podkład.  \n"
-        "- **With Lyrics**: transkrybujemy Twój fragment (Whisper), a następnie generujemy wokal Barkiem.  \n"
-        "- Wybierz płeć wokalisty, by Bark przyjął odpowiedni styl głosu."
+        "- **With Lyrics**: rozdzielamy wokal, modyfikujemy barwę (alpha), i składamy ponownie."
     )
 )
 

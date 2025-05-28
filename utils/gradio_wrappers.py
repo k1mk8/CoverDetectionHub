@@ -69,21 +69,13 @@ def gradio_test_interface(model_name, dataset):
     )
     return summary_table
 
-def gradio_generate_cover_interface(
-    audio_filepath: str,
-    duration: int,
-    cover_type: str,
-    whisper_model_name: str,
-    singer_gender: str,
-) -> str:
+def gradio_generate_cover_interface(audio_filepath: str, duration: int, cover_type: str, alpha: float ) -> str:
     if cover_type == "Instrumental":
         return generate_cover(audio_filepath, duration)
     else:
         return generate_cover_with_lyrics(
             audio_path=audio_filepath,
             duration=duration,
-            cover_type=cover_type,
-            whisper_model=whisper_model_name,
-            singer_gender=singer_gender,
+            alpha=alpha
         )
 
