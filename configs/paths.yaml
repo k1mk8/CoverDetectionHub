@@ -15,7 +15,7 @@ injected_abracadabra_reference_song: "datasets/injected_abracadabra/steve_miller
 
 datacos_listed: "datasets/datacos/datacos_listed.csv"
 
-
-
+distracted_dataset_dir: "datasets/distracted_dataset/"
+distracted_dataset_reference_dir: "datasets/distracted_dataset/reference/"
 remove_checkpoint_dir: "csi_models/checkpoints/remove/model_re-move_lsr_noe_10.pt"
 #remove_config_path: "csi_models/remove/data/lsr_defaults.json"
