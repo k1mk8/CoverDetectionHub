@@ -4,6 +4,7 @@ coverhunter_config_path: "csi_models/checkpoints/CoverHunter/our_model/config/hp
 coverhunter_checkpoint_dir: "csi_models/checkpoints/CoverHunter/our_model/pt_model"
 
 lyricover_checkpoint_path: "csi_models/checkpoints/lyricover/model.pth"
+lyricover_augmentation_checkpoint_path: "csi_models/checkpoints/lyricover_augmentations/model.pth"
 
 covers80_data_dir: "datasets/covers80/coversongs/covers32k/"
 covers80but10_data_dir: "datasets/covers80but10/coversongs/covers32k/"

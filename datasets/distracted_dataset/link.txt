@@ -1,0 +1,5 @@
+link to download dataset
+after opening paste following folders and files to this folder:
+-distracted
+-reference
+metadata.json
