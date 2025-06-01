@@ -6,6 +6,7 @@ from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidMod
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
+from csi_models.LyricoverAugmentedModel import LyricoverAugmentedModel
 from csi_models.RemoveModel import RemoveModel
 from generator.generate_cover import generate_cover
 
@@ -31,6 +32,7 @@ def gradio_cover_interface(audio1, audio2, model_name, threshold):
         "ByteCover": ByteCoverModel,
         "CoverHunter": CoverHunterModel,
         "Lyricover": LyricoverModel,
+        "Lyricover Augmented": LyricoverAugmentedModel,
         "MFCC": MFCCModel,
         "Spectral Centroid": SpectralCentroidModel,
         "Remove": RemoveModel

@@ -9,6 +9,7 @@ from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
 from csi_models.CoverHunterModel import CoverHunterModel
 from csi_models.LyricoverModel import LyricoverModel
+from csi_models.LyricoverAugmentedModel import LyricoverAugmentedModel
 from csi_models.RemoveModel import RemoveModel
 from feature_extraction.feature_extraction import MFCCModel, SpectralCentroidModel
 from evaluation.metrics import compute_mean_metrics_for_rankings
@@ -95,6 +96,7 @@ def evaluate_on_datacos(model_name: str, k=10):
         "ByteCover": ByteCoverModel,
         "CoverHunter": CoverHunterModel,
         "Lyricover": LyricoverModel,
+        "Lyricover Augmented": LyricoverAugmentedModel,
         "MFCC": MFCCModel,
         "Spectral Centroid": SpectralCentroidModel,
         "Remove": RemoveModel
