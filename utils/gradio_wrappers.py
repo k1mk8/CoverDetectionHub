@@ -9,6 +9,7 @@ from csi_models.LyricoverModel import LyricoverModel
 from csi_models.LyricoverAugmentedModel import LyricoverAugmentedModel
 from csi_models.RemoveModel import RemoveModel
 from generator.generate_cover import generate_cover
+from generator.generate_cover_with_lyrics import generate_cover_with_lyrics
 
 
 def gradio_cover_interface(audio1, audio2, model_name, threshold):
@@ -76,6 +77,13 @@ def gradio_test_interface(model_name, dataset):
     )
     return summary_table
 
-def gradio_generate_cover_interface(audio_path, duration):
-    return generate_cover(audio_path, duration)
+def gradio_generate_cover_interface(audio_filepath: str, duration: int, cover_type: str, alpha: float ) -> str:
+    if cover_type == "Instrumental":
+        return generate_cover(audio_filepath, duration)
+    else:
+        return generate_cover_with_lyrics(
+            audio_path=audio_filepath,
+            duration=duration,
+            alpha=alpha
+        )
 
