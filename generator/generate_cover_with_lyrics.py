@@ -4,7 +4,9 @@ import torchaudio
 import numpy as np
 import soundfile as sf
 import librosa
-from spleeter.separator import Separator
+import demucs
+import subprocess
+import shutil
 import pyworld as pw
 from generator.generate_cover import generate_cover, _trim_or_pad
 
@@ -17,10 +19,17 @@ def _trim_and_save(audio_path: str, duration: float) -> tuple[str, int]:
     return trimmed_path, sr
 
 def _extract_vocals(audio_path: str) -> str:
-    sep = Separator('spleeter:2stems')
-    sep.separate_to_file(audio_path, '/tmp')
-    base = os.path.join('/tmp', os.path.splitext(os.path.basename(audio_path))[0])
-    return os.path.join(base, 'vocals.wav')
+    output_dir = "/tmp/demucs_out"
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+
+    subprocess.run([
+        "demucs", "--two-stems", "vocals", "--out", output_dir, audio_path
+    ], check=True)
+
+    track_name = os.path.splitext(os.path.basename(audio_path))[0]
+    vocals_path = os.path.join(output_dir, "htdemucs", track_name, "vocals.wav")
+    return vocals_path
 
 
 def _analyze_with_world(y: np.ndarray, sr: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
