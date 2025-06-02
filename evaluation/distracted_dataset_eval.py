@@ -3,6 +3,7 @@ import gradio as gr
 import torch
 import yaml
 import logging
+import json
 from tqdm import tqdm
 from csi_models.ModelBase import ModelBase
 from csi_models.ByteCoverModel import ByteCoverModel
@@ -17,35 +18,46 @@ from evaluation.metrics import compute_mean_metrics_for_rankings
 with open("configs/paths.yaml", "r") as f:
     config = yaml.safe_load(f)
 
-COVERS80_DATA_DIR = config["covers80_data_dir"]
-COVERS80BUT10_DATA_DIR = config["covers80but10_data_dir"]
 
+DISTRACTED_DATASET_DIR = config["distracted_dataset_dir"]
+DISTRACTED_DATASET_REFERENCE_DIR = config["distracted_dataset_reference_dir"]
 
-def gather_covers80_dataset_files(dataset_path: str):
-    """Return a list of (audio_file_path, label) for all folders in the dataset."""
-    logging.info(f"Gathering dataset files from {dataset_path}")
-    if not os.path.exists(dataset_path):
-        logging.error(f"Dataset path does not exist: {dataset_path}")
-        raise FileNotFoundError(f"Dataset path does not exist: {dataset_path}")
+def gather_distracted_dataset_files(dataset_path: str):
+    """
+    Return a list of (audio_path, label) from the distracted dataset.
+    Each cover pair is given the same label.
+    """
+    json_path = os.path.join(dataset_path, "metadata.json")
+    logging.info(f"Gathering dataset files from {json_path}")
 
-    all_audio_files = []
-    song_labels = []
+    if not os.path.exists(json_path):
+        logging.error(f"JSON file does not exist: {json_path}")
+        raise FileNotFoundError(f"JSON file does not exist: {json_path}")
 
-    for folder in os.listdir(dataset_path):
-        folder_path = os.path.join(dataset_path, folder)
-        if not os.path.isdir(folder_path):
+    with open(json_path, "r") as f:
+        data = json.load(f)
+
+    files_and_labels = []
+
+    for idx, entry in enumerate(data):
+        song1 = entry["song1"]
+        song2 = entry["song2"]
+
+        label = f"{song1['author']} - {song1['title']}"  # consistent label
+
+        path1 = os.path.join(dataset_path, song1["path"])
+        path2 = os.path.join(dataset_path, song2["path"])
+
+        if not os.path.exists(path1) or not os.path.exists(path2):
+            logging.warning(f"Missing files for entry {idx}: {path1}, {path2}")
             continue
 
-        audio_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".mp3")]
-        if len(audio_files) < 2:
-            # Skipping folder folder with less than 2 files
-            logging.warning(f"Skipping folder '{folder}' with less than 2 files.")
-            continue
+        files_and_labels.extend([
+            (path1, label),
+            (path2, label),
+        ])
 
-        all_audio_files.extend(audio_files)
-        song_labels.extend([folder] * len(audio_files))
-
-    return list(zip(all_audio_files, song_labels))
+    return files_and_labels
 
 
 def compute_embeddings(files_and_labels, model: ModelBase, progress=gr.Progress()):
@@ -98,11 +110,14 @@ def compute_rankings_per_song(files_and_labels, model: ModelBase, progress=gr.Pr
     return rankings_per_query
 
 
-def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
-    """Evaluate a model on the covers80 dataset."""
-    dataset_path = COVERS80BUT10_DATA_DIR if covers80but10 else COVERS80_DATA_DIR
+def evaluate_on_distracted_dataset(model_name: str, reference=False, k=10):
+    """Evaluate a model on the distracted dataset."""
+    if reference:
+        dataset_path = DISTRACTED_DATASET_REFERENCE_DIR
+    else:
+        dataset_path = DISTRACTED_DATASET_DIR
     logging.info(f"Evaluating model '{model_name}' on dataset '{dataset_path}' with k={k}.")
-    files_and_labels = gather_covers80_dataset_files(dataset_path)
+    files_and_labels = gather_distracted_dataset_files(dataset_path)
 
     model_mapping = {
         "ByteCover": ByteCoverModel,
@@ -123,10 +138,19 @@ def evaluate_on_covers80(model_name: str, covers80but10=False, k=10):
     rankings_per_query = compute_rankings_per_song(files_and_labels, model)
     metrics = compute_mean_metrics_for_rankings(rankings_per_query, k=k)
 
-    return {
-        "Model": model_name,
-        "Dataset": "covers80but10" if covers80but10 else "covers80",
-        "Mean Average Precision (mAP)": metrics["mAP"],
-        f"Precision at {k} (mP@{k})": metrics["mP@k"],
-        "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
-    }
+    if reference:
+        return {
+            "Model": model_name,
+            "Dataset": "distracted_dataset reference",
+            "Mean Average Precision (mAP)": metrics["mAP"],
+            f"Precision at {k} (mP@{k})": metrics["mP@k"],
+            "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
+        }
+    else:
+        return {
+            "Model": model_name,
+            "Dataset": "distracted_dataset",
+            "Mean Average Precision (mAP)": metrics["mAP"],
+            f"Precision at {k} (mP@{k})": metrics["mP@k"],
+            "Mean Rank of First Correct Cover (mMR1)": metrics["mMR1"]
+        }
