@@ -261,6 +261,17 @@ The selection of metrics is based on Mirex Cover Song Identification Contest.
 | **Spectral Centroid**    | 0.04352                     | 0.00793                         | 76.80488                                      |
 | **Model: Augmented Lyricover**    | 0.80529                    | 0.09939                        | 4.98780                                      |
 
+### Dataset: Distracted Dataset 
+
+| Dataset / Model          | Mean Average Precision (mAP) | Precision at 10 (P@10) / mP@10 | Mean Rank of First Correct Cover (MR1 / mMR1) |
+|--------------------------|------------------------------|---------------------------------|-----------------------------------------------|
+| **Model: re-move**       | **0.32454**                 | 0.07349                         | 19.48                                      |
+| **Model: Lyricover**     | 0.25801                     | 0.05749                        | 44.14                                      |
+| **Model: Augmented Lyricover**     | 0.26876                    | 0.05299                        | 41.69                                      |
+| **Model: CoverHunter**   | 0.27697                     | 0.05799                         | 28.77                                       |
+| **Model: ByteCover**     | 0.16761                     | 0.03299                         | 47.42                                         |
+| **MFCC**                 | 0.04621                     | 0.01200                         | 93.935                                       |
+
 ## Tests on bigger subset of shs100k dataset
 
 ### Dataset: Covers80 
@@ -320,10 +331,10 @@ Furthermore W&B framework was implemented into the code, allowing for more robus
 
 We conducted several experiments, testing the dataset with different number of augmentations, measuring their effect on the model performence. Our initial strategyu was to perform fine tuning with augmentations on new training data and compare the effects of new learning. However due to taking too much epochs and too large of a learning rate we overfitted the model in initial experimentation phase. After lowering number of epochs and limiting learining rate we conducted further experimentations on larger pool of augmentations. 
 
-## SELECTED AUGMETNATIONS AND AUGMENTATION STRATEGY
+## Augmented Lyricover Evaluation
 
 
-Our final effect is the datasets that beats it's predecessor in terms of precsision, by the price of becoming more conservative and lowering Recall.
+Here we present effects of the augmentations on the model we received after experiments with augmentations.
 
 For example on test dataset after training our model received following score:
 
@@ -371,7 +382,6 @@ Lyricover trained with augmentations
 | Injected Abracadabra  | 0.88648 | 0.90000 | 1.00000 |
 | Covers80              | 0.80529 | 0.09939 | 4.98780 |
 | Distracted Dataset    | 0.26877 | 0.05300 | 41.69000 |
-| Distracted Reference  | 0.28922 | 0.07000 | 34.90000 |
 
 Original Lyricover
 | Dataset               | mAP     | mP@10   | mMR1    |
@@ -379,7 +389,6 @@ Original Lyricover
 | Injected Abracadabra  | 0.82029 | 0.90000 | 1.00000 |
 | Covers80              | 0.83425 | 0.09939 | 7.41463 |
 | Distracted Dataset    | 0.25801 | 0.05750 | 44.14000 |
-| Distracted Reference  | 0.28662 | 0.06950 | 43.84500 |
 
 For more information about this experiment: 
 https://github.com/wojtekBozek/LyriCover.git
@@ -391,4 +400,13 @@ https://github.com/wojtekBozek/LyriCover.git
 - we recomend conducting further experimenations on sets of augmentations, but with lyrics generated each time.
 - another possible addition would be exploring torchaudio library and whisper model parraller options in order to make feature extraction more robust. (lyricover)
 
+
+
+## Useful Links
+
+ - [Checkpoints and datasets](https://drive.google.com/drive/folders/19fAW7Nmk4CwncsfHQkrAYQ0fSFgcEHsw) - dataasets and checkopints
+ - [augmented lyricover model checkpoint](https://drive.google.com/file/d/10UvcPfOJhAIfoUp1jze8jl-7V6ysD7oU/view?usp=drive_link)
+ - [Distracted Dataset](https://drive.google.com/file/d/134V7bc82_P-wG4jMNEoE08HbsImQQtVD/view?usp=drive_link)
+
+ 
 The logo has been designed using DALL-E model.
