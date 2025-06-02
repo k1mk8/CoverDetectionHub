@@ -172,6 +172,10 @@ torchaudio==2.1.0
 torchdata==0.7.0
 torchmetrics==1.7.1
 torchtext==0.16.0
+SQLAlchemy==2.0.36
+tiktoken==0.8.0
+tomli==2.2.1
+tomlkit==0.12.0
 torchvision==0.16.0
 tqdm==4.67.1
 transformers==4.52.3
